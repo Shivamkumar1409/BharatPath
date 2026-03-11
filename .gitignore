@@ -1,0 +1,28 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+venv/
+
+# Environment variables (NEVER commit these)
+.env
+**/.env
+
+# AI Model
+*.h5
+*.pkl
+
+# Dataset
+dataset/
+
+# Node
+node_modules/
+.env.local
+build/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# VS Code
+.vscode/
