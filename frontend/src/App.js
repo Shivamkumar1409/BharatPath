@@ -1,4 +1,3 @@
-import Profile from './pages/Profile';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Dashboard from './pages/Dashboard';
@@ -8,6 +7,8 @@ import ProfitTracker from './pages/ProfitTracker';
 import Schemes from './pages/Schemes';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import Profile from './pages/Profile';
+import Weather from './pages/Weather';
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/weather" element={<Weather />} />
         </Routes>
       </div>
     </BrowserRouter>
