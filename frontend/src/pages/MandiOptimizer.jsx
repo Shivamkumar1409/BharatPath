@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { getBestMandi, getPricePrediction } from '../services/api';
 
 const CROPS = ['Wheat', 'Rice', 'Tomato', 'Onion', 'Potato', 'Mustard', 'Cotton', 'Sugarcane', 'Maize', 'Soyabean'];
@@ -14,199 +15,222 @@ export default function MandiOptimizer() {
   const [error, setError] = useState(null);
 
   const handleSubmit = async () => {
-    if (!crop || !quantity) {
-      setError('Please select crop and enter quantity');
-      return;
-    }
-    setLoading(true);
-    setError(null);
-    setResults(null);
+    if (!crop || !quantity) { setError('Please select crop and enter quantity'); return; }
+    setLoading(true); setError(null); setResults(null);
     try {
       const res = await getBestMandi(crop, parseFloat(quantity), district);
-      if (res.data.error) {
-        setError(res.data.error);
-      } else {
-        setResults(res.data);
-      }
-    } catch (err) {
-      setError('Could not fetch mandi data. Please try again.');
-    }
+      res.data.error ? setError(res.data.error) : setResults(res.data);
+    } catch { setError('Could not fetch mandi data. Please try again.'); }
     setLoading(false);
   };
 
   const handlePrediction = async () => {
-    if (!crop) {
-      setError('Please select a crop first');
-      return;
-    }
-    setPredLoading(true);
-    setError(null);
+    if (!crop) { setError('Please select a crop first'); return; }
+    setPredLoading(true); setError(null);
     try {
       const res = await getPricePrediction(crop);
-      if (res.data.error) {
-        setError(res.data.error);
-      } else {
-        setPrediction(res.data);
-      }
-    } catch (err) {
-      setError('Could not fetch price prediction.');
-    }
+      res.data.error ? setError(res.data.error) : setPrediction(res.data);
+    } catch { setError('Could not fetch price prediction.'); }
     setPredLoading(false);
   };
+
+  const medals = ['🥇', '🥈', '🥉'];
+  const medalBorders = ['border-yellow-300', 'border-gray-300', 'border-orange-300'];
+  const medalBgs = ['bg-yellow-50', 'bg-gray-50', 'bg-orange-50'];
 
   return (
     <div className="min-h-screen bg-gray-50">
 
       {/* Header */}
-      <div className="bg-gradient-to-r from-blue-700 to-blue-500 text-white px-6 py-8">
-        <div className="max-w-5xl mx-auto">
-          <h1 className="text-3xl font-bold mb-1">📊 Smart Mandi Optimizer</h1>
-          <p className="text-blue-100">Live prices from Government of India — data.gov.in</p>
-          <span className="inline-block mt-2 px-3 py-1 bg-blue-800 rounded-full text-xs text-blue-200">
-            🏛️ Official Source: Ministry of Agriculture
-          </span>
+      <div className="bg-gradient-to-r from-blue-700 to-blue-500 text-white px-6 py-10 relative overflow-hidden">
+        <div className="absolute inset-0">
+          {[...Array(12)].map((_, i) => (
+            <motion.div key={i}
+              className="absolute w-1.5 h-1.5 bg-white rounded-full opacity-20"
+              style={{ left: `${Math.random() * 100}%`, top: `${Math.random() * 100}%` }}
+              animate={{ y: [-8, 8, -8], opacity: [0.1, 0.4, 0.1] }}
+              transition={{ duration: 3 + Math.random() * 2, repeat: Infinity, delay: Math.random() * 2 }}
+            />
+          ))}
+        </div>
+        <div className="relative z-10 max-w-5xl mx-auto">
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+            <h1 className="text-4xl font-black mb-2">📊 Smart Mandi Optimizer</h1>
+            <p className="text-blue-100">Live prices from Government of India — data.gov.in</p>
+            <div className="flex items-center space-x-3 mt-3">
+              <span className="px-3 py-1 bg-white bg-opacity-20 rounded-full text-white text-xs border border-white border-opacity-30">
+                🏛️ Ministry of Agriculture
+              </span>
+              <span className="px-3 py-1 bg-white bg-opacity-20 rounded-full text-white text-xs border border-white border-opacity-30">
+                📅 Updated Daily
+              </span>
+            </div>
+          </motion.div>
         </div>
       </div>
 
       <div className="max-w-5xl mx-auto px-4 py-8">
 
         {/* Input Form */}
-        <div className="bg-white rounded-xl shadow-md p-6 mb-6">
-          <h2 className="text-xl font-bold text-gray-800 mb-4">🌾 Enter Your Crop Details</h2>
+        <motion.div
+          className="bg-white rounded-2xl border border-gray-100 p-6 mb-6"
+          initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
+          style={{ boxShadow: '0 4px 20px rgba(0,0,0,0.06)' }}
+        >
+          <h2 className="text-xl font-bold text-gray-800 mb-4">🌾 Enter Crop Details</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Crop Type</label>
-              <select
-                value={crop}
+              <label className="block text-sm font-medium text-gray-600 mb-1">Crop Type</label>
+              <select value={crop}
                 onChange={(e) => { setCrop(e.target.value); setResults(null); setPrediction(null); }}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                className="w-full border border-gray-200 rounded-xl px-3 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400 bg-gray-50"
               >
                 <option value="">Select Crop</option>
-                {CROPS.map((c) => <option key={c} value={c}>{c}</option>)}
+                {CROPS.map(c => <option key={c} value={c}>{c}</option>)}
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Quantity (kg)</label>
-              <input
-                type="number"
-                value={quantity}
+              <label className="block text-sm font-medium text-gray-600 mb-1">Quantity (kg)</label>
+              <input type="number" value={quantity}
                 onChange={(e) => setQuantity(e.target.value)}
                 placeholder="e.g. 500"
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                className="w-full border border-gray-200 rounded-xl px-3 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400 bg-gray-50"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Your District (optional)</label>
-              <input
-                type="text"
-                value={district}
+              <label className="block text-sm font-medium text-gray-600 mb-1">District (optional)</label>
+              <input type="text" value={district}
                 onChange={(e) => setDistrict(e.target.value)}
                 placeholder="e.g. Delhi"
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                className="w-full border border-gray-200 rounded-xl px-3 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400 bg-gray-50"
               />
             </div>
           </div>
 
-          {error && <p className="text-red-500 text-sm mt-3">⚠️ {error}</p>}
+          {error && (
+            <motion.p className="text-red-500 text-sm mt-3 bg-red-50 p-2 rounded-lg"
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+              ⚠️ {error}
+            </motion.p>
+          )}
 
           <div className="flex flex-col md:flex-row gap-3 mt-4">
-            <button
-              onClick={handleSubmit}
-              disabled={loading}
+            <motion.button onClick={handleSubmit} disabled={loading}
               className="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition shadow-md"
+              whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
             >
               {loading ? '🔄 Finding Best Mandi...' : '🔍 Find Best Mandi'}
-            </button>
-            <button
-              onClick={handlePrediction}
-              disabled={predLoading}
+            </motion.button>
+            <motion.button onClick={handlePrediction} disabled={predLoading}
               className="px-8 py-3 bg-green-600 hover:bg-green-700 text-white font-bold rounded-xl transition shadow-md"
+              whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
             >
               {predLoading ? '🔄 Predicting...' : '📈 Predict Price'}
-            </button>
+            </motion.button>
           </div>
-        </div>
+        </motion.div>
 
         {/* Mandi Results */}
-        {results && (
-          <div className="mb-6">
-            <div className="flex items-center justify-between mb-3">
-              <h2 className="text-xl font-bold text-gray-800">🏆 Best Mandis for {results.crop}</h2>
-              <span className="text-xs text-gray-400 bg-gray-100 px-3 py-1 rounded-full">
-                🏛️ {results.source}
-              </span>
-            </div>
-            <div className="space-y-3">
-              {results.recommendations.map((mandi, i) => (
-                <div key={i} className={`bg-white rounded-xl shadow-md p-5 border-l-4 ${
-                  i === 0 ? 'border-yellow-400' : i === 1 ? 'border-gray-400' : 'border-orange-400'
-                }`}>
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <div className="flex items-center space-x-2 mb-1">
-                        <span className="text-2xl">{i === 0 ? '🥇' : i === 1 ? '🥈' : '🥉'}</span>
-                        <h3 className="text-lg font-bold text-gray-800">{mandi.mandi}</h3>
+        <AnimatePresence>
+          {results && (
+            <motion.div className="mb-6"
+              initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
+            >
+              <div className="flex items-center justify-between mb-3">
+                <h2 className="text-xl font-bold text-gray-800">🏆 Best Mandis for {results.crop}</h2>
+                <span className="text-xs text-gray-400 bg-gray-100 px-3 py-1 rounded-full">
+                  🏛️ {results.source}
+                </span>
+              </div>
+              <div className="space-y-3">
+                {results.recommendations.map((mandi, i) => (
+                  <motion.div key={i}
+                    className={`bg-white border ${medalBorders[i]} ${medalBgs[i]} rounded-2xl p-5`}
+                    initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: i * 0.1 }}
+                    whileHover={{ scale: 1.01, x: 3 }}
+                    style={{ boxShadow: '0 4px 15px rgba(0,0,0,0.06)' }}
+                  >
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <div className="flex items-center space-x-2 mb-1">
+                          <span className="text-2xl">{medals[i]}</span>
+                          <h3 className="text-lg font-bold text-gray-800">{mandi.mandi}</h3>
+                        </div>
+                        <p className="text-gray-500 text-sm">📍 {mandi.district}, {mandi.state}</p>
+                        <p className="text-gray-400 text-xs mt-1">📅 Data as of: {mandi.date}</p>
                       </div>
-                      <p className="text-gray-500 text-sm">📍 {mandi.district}, {mandi.state}</p>
-                      <p className="text-gray-400 text-xs mt-1">📅 Data as of: {mandi.date}</p>
+                      <div className="text-right">
+                        <p className="text-3xl font-black text-green-600">₹{mandi.price}</p>
+                        <p className="text-gray-400 text-xs">per quintal</p>
+                      </div>
                     </div>
-                    <div className="text-right">
-                      <p className="text-2xl font-bold text-green-600">₹{mandi.price}</p>
-                      <p className="text-gray-400 text-xs">per quintal</p>
+                    <div className="mt-3 pt-3 border-t border-gray-200 flex justify-between items-center">
+                      <span className="text-gray-500 text-sm">Revenue for {results.quantity}kg</span>
+                      <span className="font-bold text-blue-600 text-lg">₹{mandi.estimated_revenue?.toLocaleString()}</span>
                     </div>
-                  </div>
-                  <div className="mt-3 pt-3 border-t border-gray-100 flex justify-between items-center">
-                    <span className="text-sm text-gray-600">Estimated Revenue for {results.quantity}kg</span>
-                    <span className="font-bold text-blue-600">₹{mandi.estimated_revenue?.toLocaleString()}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
+                  </motion.div>
+                ))}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* Price Prediction */}
-        {prediction && (
-          <div className="bg-white rounded-xl shadow-md p-6 mb-6">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-bold text-gray-800">📈 Price Prediction — {prediction.crop}</h2>
-              <span className="text-xs text-gray-400 bg-gray-100 px-3 py-1 rounded-full">
-                🏛️ {prediction.source}
-              </span>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="bg-green-50 border border-green-200 rounded-xl p-4 text-center">
-                <p className="text-gray-500 text-sm mb-1">Predicted Next Price</p>
-                <p className="text-3xl font-bold text-green-600">₹{prediction.predicted_price}</p>
-                <p className="text-gray-400 text-xs">per quintal</p>
+        <AnimatePresence>
+          {prediction && (
+            <motion.div
+              className="bg-white rounded-2xl border border-gray-100 p-6 mb-6"
+              initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
+              style={{ boxShadow: '0 4px 20px rgba(0,0,0,0.06)' }}
+            >
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-bold text-gray-800">📈 Price Prediction — {prediction.crop}</h2>
+                <span className="text-xs text-gray-400 bg-gray-100 px-3 py-1 rounded-full">
+                  🏛️ {prediction.source}
+                </span>
               </div>
-              <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 text-center">
-                <p className="text-gray-500 text-sm mb-1">Price Trend</p>
-                <p className="text-2xl font-bold text-blue-600">{prediction.trend}</p>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {[
+                  { label: 'Predicted Next Price', value: `₹${prediction.predicted_price}`, sub: 'per quintal', bg: 'bg-green-50', border: 'border-green-200', text: 'text-green-600' },
+                  { label: 'Price Trend', value: prediction.trend, sub: 'based on recent data', bg: 'bg-blue-50', border: 'border-blue-200', text: 'text-blue-600' },
+                  { label: 'Average Price', value: `₹${prediction.average_price}`, sub: 'per quintal', bg: 'bg-yellow-50', border: 'border-yellow-200', text: 'text-yellow-600' },
+                ].map((item, i) => (
+                  <motion.div key={i}
+                    className={`${item.bg} border ${item.border} rounded-xl p-4 text-center`}
+                    initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: i * 0.1 }}
+                    whileHover={{ scale: 1.03 }}
+                  >
+                    <p className="text-gray-500 text-sm mb-1">{item.label}</p>
+                    <p className={`text-2xl font-black ${item.text}`}>{item.value}</p>
+                    <p className="text-gray-400 text-xs mt-1">{item.sub}</p>
+                  </motion.div>
+                ))}
               </div>
-              <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4 text-center">
-                <p className="text-gray-500 text-sm mb-1">Average Price</p>
-                <p className="text-3xl font-bold text-yellow-600">₹{prediction.average_price}</p>
-                <p className="text-gray-400 text-xs">per quintal</p>
-              </div>
-            </div>
-          </div>
-        )}
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* Info Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {[
-            { icon: '🏛️', title: 'Official Government Data', desc: 'Live prices from data.gov.in — Ministry of Agriculture' },
-            { icon: '📅', title: 'Updated Daily', desc: 'Fresh mandi prices every day from across India' },
-            { icon: '🤖', title: 'AI Price Prediction', desc: 'Machine learning forecasts future crop prices' },
+            { icon: '🏛️', title: 'Official Govt Data', desc: 'Live from data.gov.in — Ministry of Agriculture', bg: 'bg-blue-50', border: 'border-blue-100' },
+            { icon: '📅', title: 'Updated Daily', desc: 'Fresh mandi prices every day from across India', bg: 'bg-green-50', border: 'border-green-100' },
+            { icon: '🤖', title: 'AI Prediction', desc: 'Machine learning forecasts future crop prices', bg: 'bg-purple-50', border: 'border-purple-100' },
           ].map((card, i) => (
-            <div key={i} className="bg-white rounded-xl shadow-sm p-4 flex items-start space-x-3 border border-gray-100">
+            <motion.div key={i}
+              className={`${card.bg} border ${card.border} rounded-xl p-4 flex items-start space-x-3`}
+              initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 + i * 0.1 }}
+              whileHover={{ scale: 1.02, y: -2 }}
+            >
               <span className="text-3xl">{card.icon}</span>
               <div>
                 <h3 className="font-bold text-gray-800">{card.title}</h3>
                 <p className="text-gray-500 text-sm">{card.desc}</p>
               </div>
-            </div>
+            </motion.div>
           ))}
         </div>
       </div>

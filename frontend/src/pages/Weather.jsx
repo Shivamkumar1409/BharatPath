@@ -1,11 +1,73 @@
 import { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 
 const CITIES = [
   'Delhi', 'Mumbai', 'Lucknow', 'Patna', 'Jaipur',
   'Bhopal', 'Hyderabad', 'Chennai', 'Kolkata', 'Pune',
-  'Chandigarh', 'Nagpur', 'Indore', 'Bhubaneswar', 'Raipur'
+  'Chandigarh', 'Nagpur', 'Indore', 'Bhubaneswar', 'Raipur',
+  'Amritsar', 'Varanasi', 'Agra', 'Surat', 'Ahmedabad'
 ];
+
+const getWeatherTheme = (desc) => {
+  if (!desc) return {
+    bg: 'from-blue-500 to-indigo-600',
+    card: 'bg-blue-50 border-blue-100',
+    text: 'text-blue-700',
+    light: 'bg-blue-100',
+    emoji: '🌤️'
+  };
+  desc = desc.toLowerCase();
+  if (desc.includes('rain') || desc.includes('drizzle')) return {
+    bg: 'from-slate-600 to-blue-700',
+    card: 'bg-slate-50 border-slate-200',
+    text: 'text-slate-700',
+    light: 'bg-slate-100',
+    emoji: '🌧️'
+  };
+  if (desc.includes('cloud')) return {
+    bg: 'from-gray-500 to-slate-600',
+    card: 'bg-gray-50 border-gray-200',
+    text: 'text-gray-700',
+    light: 'bg-gray-100',
+    emoji: '⛅'
+  };
+  if (desc.includes('clear') || desc.includes('sunny')) return {
+    bg: 'from-orange-400 to-yellow-500',
+    card: 'bg-orange-50 border-orange-100',
+    text: 'text-orange-700',
+    light: 'bg-orange-100',
+    emoji: '☀️'
+  };
+  if (desc.includes('storm') || desc.includes('thunder')) return {
+    bg: 'from-gray-700 to-purple-800',
+    card: 'bg-gray-50 border-gray-200',
+    text: 'text-gray-700',
+    light: 'bg-gray-100',
+    emoji: '⛈️'
+  };
+  if (desc.includes('snow') || desc.includes('hail')) return {
+    bg: 'from-blue-300 to-cyan-400',
+    card: 'bg-cyan-50 border-cyan-100',
+    text: 'text-cyan-700',
+    light: 'bg-cyan-100',
+    emoji: '❄️'
+  };
+  if (desc.includes('haze') || desc.includes('mist') || desc.includes('fog')) return {
+    bg: 'from-amber-400 to-orange-500',
+    card: 'bg-amber-50 border-amber-100',
+    text: 'text-amber-700',
+    light: 'bg-amber-100',
+    emoji: '🌫️'
+  };
+  return {
+    bg: 'from-blue-500 to-indigo-600',
+    card: 'bg-blue-50 border-blue-100',
+    text: 'text-blue-700',
+    light: 'bg-blue-100',
+    emoji: '🌤️'
+  };
+};
 
 export default function Weather() {
   const [city, setCity] = useState('Delhi');
@@ -14,29 +76,18 @@ export default function Weather() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    fetchWeather('Delhi');
-  }, []);
+  useEffect(() => { fetchWeather('Delhi'); }, []);
 
   const fetchWeather = async (selectedCity) => {
-    setLoading(true);
-    setError(null);
+    setLoading(true); setError(null);
     try {
-      const [weatherRes, forecastRes] = await Promise.all([
+      const [w, f] = await Promise.all([
         axios.get(`http://localhost:8000/weather/current?city=${selectedCity}`),
         axios.get(`http://localhost:8000/weather/forecast?city=${selectedCity}`)
       ]);
-      if (weatherRes.data.error) {
-        setError(weatherRes.data.error);
-      } else {
-        setWeather(weatherRes.data);
-      }
-      if (!forecastRes.data.error) {
-        setForecast(forecastRes.data);
-      }
-    } catch (err) {
-      setError('Could not fetch weather data.');
-    }
+      w.data.error ? setError(w.data.error) : setWeather(w.data);
+      if (!f.data.error) setForecast(f.data);
+    } catch { setError('Could not fetch weather.'); }
     setLoading(false);
   };
 
@@ -45,125 +96,169 @@ export default function Weather() {
     fetchWeather(e.target.value);
   };
 
-  const getWeatherBg = (desc) => {
-    if (!desc) return 'from-blue-600 to-blue-400';
-    desc = desc.toLowerCase();
-    if (desc.includes('rain')) return 'from-gray-600 to-blue-500';
-    if (desc.includes('cloud')) return 'from-gray-500 to-gray-400';
-    if (desc.includes('clear')) return 'from-orange-500 to-yellow-400';
-    if (desc.includes('storm')) return 'from-gray-800 to-gray-600';
-    return 'from-blue-600 to-blue-400';
-  };
+  const theme = getWeatherTheme(weather?.description);
 
   return (
     <div className="min-h-screen bg-gray-50">
 
-      {/* Header */}
-      <div className={`bg-gradient-to-r ${getWeatherBg(weather?.description)} text-white px-6 py-8`}>
-        <div className="max-w-4xl mx-auto">
-          <h1 className="text-3xl font-bold mb-1">🌤️ Farm Weather</h1>
-          <p className="text-white text-opacity-80">Weather forecasts to plan your farming activities</p>
-        </div>
-      </div>
+      {/* Dynamic Weather Header */}
+      <motion.div
+        className={`relative overflow-hidden bg-gradient-to-br ${theme.bg} text-white px-6 py-12`}
+        animate={{ background: theme.bg }}
+        transition={{ duration: 1 }}
+      >
+        {/* Animated background circles */}
+        <motion.div
+          className="absolute -top-20 -right-20 w-64 h-64 bg-white rounded-full opacity-5"
+          animate={{ scale: [1, 1.2, 1], rotate: [0, 90, 0] }}
+          transition={{ duration: 8, repeat: Infinity }}
+        />
+        <motion.div
+          className="absolute -bottom-16 -left-16 w-48 h-48 bg-white rounded-full opacity-5"
+          animate={{ scale: [1.2, 1, 1.2], rotate: [0, -90, 0] }}
+          transition={{ duration: 6, repeat: Infinity }}
+        />
 
-      <div className="max-w-4xl mx-auto px-4 py-8">
+        <div className="relative z-10 max-w-4xl mx-auto">
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+            <p className="text-white text-opacity-70 text-sm mb-1 uppercase tracking-widest">Farm Weather</p>
+            <h1 className="text-5xl font-black mb-1">
+              {loading ? '...' : weather ? `${weather.temperature}°C` : '--°C'}
+            </h1>
+            <p className="text-white text-opacity-80 text-xl">
+              {weather ? weather.description : 'Loading...'}
+              {weather && <span className="ml-2">{theme.emoji}</span>}
+            </p>
+            <p className="text-white text-opacity-60 text-sm mt-1">
+              {weather ? `${weather.city} • Feels like ${weather.feels_like}°C` : ''}
+            </p>
+          </motion.div>
+        </div>
+      </motion.div>
+
+      <div className="max-w-4xl mx-auto px-4 py-6">
 
         {/* City Selector */}
-        <div className="bg-white rounded-xl shadow-md p-4 mb-6">
-          <label className="block text-sm font-medium text-gray-700 mb-2">Select Your City</label>
-          <select
-            value={city}
-            onChange={handleCityChange}
-            className="w-full border border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-400"
+        <motion.div
+          className="bg-white rounded-2xl border border-gray-100 p-4 mb-6 -mt-6 relative z-10"
+          initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+          style={{ boxShadow: '0 8px 30px rgba(0,0,0,0.08)' }}
+        >
+          <label className="block text-sm font-medium text-gray-500 mb-2">📍 Select Your City</label>
+          <select value={city} onChange={handleCityChange}
+            className="w-full border border-gray-200 rounded-xl px-4 py-3 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400 bg-gray-50 font-medium"
           >
             {CITIES.map(c => <option key={c} value={c}>{c}</option>)}
           </select>
-        </div>
+        </motion.div>
+
+        {error && (
+          <motion.div className="bg-red-50 border border-red-200 rounded-xl p-4 mb-6"
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+            <p className="text-red-500">⚠️ {error}</p>
+            <p className="text-red-400 text-sm mt-1">Weather API may still be activating. Try again shortly.</p>
+          </motion.div>
+        )}
 
         {loading && (
           <div className="text-center py-12">
-            <span className="text-5xl block mb-3 animate-bounce">🌤️</span>
-            <p className="text-gray-500">Fetching weather data...</p>
+            <motion.div
+              className="text-6xl mb-4 inline-block"
+              animate={{ rotate: 360 }} transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
+            >🌀</motion.div>
+            <p className="text-gray-400">Fetching weather data...</p>
           </div>
         )}
 
-        {error && (
-          <div className="bg-red-50 border border-red-200 rounded-xl p-4 mb-6">
-            <p className="text-red-600">⚠️ {error}</p>
-            <p className="text-red-400 text-sm mt-1">Weather API key is activating. Please try again in 2 hours.</p>
-          </div>
-        )}
-
-        {weather && !loading && (
-          <>
-            {/* Current Weather Card */}
-            <div className={`bg-gradient-to-r ${getWeatherBg(weather.description)} rounded-2xl shadow-lg p-6 mb-6 text-white`}>
-              <div className="flex justify-between items-start">
-                <div>
-                  <h2 className="text-2xl font-bold">{weather.city}</h2>
-                  <p className="text-white text-opacity-80">{weather.description}</p>
-                  <p className="text-6xl font-bold mt-4">{weather.temperature}°C</p>
-                  <p className="text-white text-opacity-70 mt-1">Feels like {weather.feels_like}°C</p>
-                </div>
-                <img
-                  src={`https://openweathermap.org/img/wn/${weather.icon}@2x.png`}
-                  alt="weather"
-                  className="w-20 h-20"
-                />
+        <AnimatePresence>
+          {weather && !loading && (
+            <motion.div
+              key={city}
+              initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0 }} transition={{ duration: 0.5 }}
+            >
+              {/* Weather Stats Grid */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                {[
+                  { label: 'Humidity', value: `${weather.humidity}%`, icon: '💧', color: 'bg-blue-50 border-blue-100 text-blue-600' },
+                  { label: 'Wind Speed', value: `${weather.wind_speed} m/s`, icon: '💨', color: 'bg-cyan-50 border-cyan-100 text-cyan-600' },
+                  { label: 'Visibility', value: `${weather.visibility} km`, icon: '👁️', color: 'bg-purple-50 border-purple-100 text-purple-600' },
+                  { label: 'Feels Like', value: `${weather.feels_like}°C`, icon: '🌡️', color: 'bg-orange-50 border-orange-100 text-orange-600' },
+                ].map((stat, i) => (
+                  <motion.div key={i}
+                    className={`bg-white border rounded-2xl p-4 text-center`}
+                    initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: i * 0.1 }}
+                    whileHover={{ scale: 1.04, y: -3 }}
+                    style={{ boxShadow: '0 4px 15px rgba(0,0,0,0.06)' }}
+                  >
+                    <span className="text-2xl block mb-1">{stat.icon}</span>
+                    <p className={`text-xl font-black ${stat.color.split(' ')[2]}`}>{stat.value}</p>
+                    <p className="text-gray-400 text-xs mt-1">{stat.label}</p>
+                  </motion.div>
+                ))}
               </div>
 
-              {/* Weather Stats */}
-              <div className="grid grid-cols-3 gap-4 mt-6 pt-4 border-t border-white border-opacity-30">
-                <div className="text-center">
-                  <p className="text-white text-opacity-70 text-sm">Humidity</p>
-                  <p className="font-bold text-lg">{weather.humidity}%</p>
+              {/* Farming Advice */}
+              <motion.div
+                className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-100 rounded-2xl p-5 mb-6"
+                initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.3 }}
+                whileHover={{ scale: 1.01 }}
+                style={{ boxShadow: '0 4px 15px rgba(0,0,0,0.06)' }}
+              >
+                <div className="flex items-start space-x-3">
+                  <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center text-xl flex-shrink-0">
+                    🌾
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-green-800 mb-1">Farming Advice</h3>
+                    <p className="text-green-700 text-sm leading-relaxed">{weather.farming_advice}</p>
+                  </div>
                 </div>
-                <div className="text-center">
-                  <p className="text-white text-opacity-70 text-sm">Wind</p>
-                  <p className="font-bold text-lg">{weather.wind_speed} m/s</p>
-                </div>
-                <div className="text-center">
-                  <p className="text-white text-opacity-70 text-sm">Visibility</p>
-                  <p className="font-bold text-lg">{weather.visibility} km</p>
-                </div>
-              </div>
-            </div>
+              </motion.div>
 
-            {/* Farming Advice */}
-            <div className="bg-green-50 border border-green-200 rounded-xl p-5 mb-6">
-              <h3 className="font-bold text-green-800 text-lg mb-2">🌾 Farming Advice</h3>
-              <p className="text-green-700">{weather.farming_advice}</p>
-            </div>
-
-            {/* 5-item Forecast */}
-            {forecast && (
-              <div className="bg-white rounded-xl shadow-md p-6">
-                <h3 className="font-bold text-gray-800 text-lg mb-4">📅 Short-term Forecast</h3>
-                <div className="space-y-3">
-                  {forecast.forecasts.map((f, i) => (
-                    <div key={i} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                      <div className="flex items-center space-x-3">
-                        <img
-                          src={`https://openweathermap.org/img/wn/${f.icon}.png`}
-                          alt="weather"
-                          className="w-10 h-10"
-                        />
-                        <div>
-                          <p className="font-medium text-gray-800">{f.description}</p>
-                          <p className="text-gray-400 text-xs">{new Date(f.time).toLocaleString('en-IN')}</p>
+              {/* Forecast */}
+              {forecast && (
+                <motion.div
+                  className="bg-white rounded-2xl border border-gray-100 p-6"
+                  initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.4 }}
+                  style={{ boxShadow: '0 4px 20px rgba(0,0,0,0.06)' }}
+                >
+                  <h3 className="font-bold text-gray-800 text-lg mb-4">📅 Short-term Forecast</h3>
+                  <div className="space-y-3">
+                    {forecast.forecasts.map((f, i) => (
+                      <motion.div key={i}
+                        className="flex items-center justify-between p-3 bg-gray-50 rounded-xl hover:bg-gray-100 transition"
+                        initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.4 + i * 0.08 }}
+                        whileHover={{ x: 4 }}
+                      >
+                        <div className="flex items-center space-x-3">
+                          <img
+                            src={`https://openweathermap.org/img/wn/${f.icon}.png`}
+                            alt="weather" className="w-10 h-10"
+                          />
+                          <div>
+                            <p className="font-medium text-gray-700 text-sm">{f.description}</p>
+                            <p className="text-gray-400 text-xs">
+                              {new Date(f.time).toLocaleString('en-IN', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
+                            </p>
+                          </div>
                         </div>
-                      </div>
-                      <div className="text-right">
-                        <p className="font-bold text-gray-800">{f.temp}°C</p>
-                        <p className="text-gray-400 text-xs">{f.humidity}% humidity</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </>
-        )}
+                        <div className="text-right">
+                          <p className="font-black text-gray-800">{f.temp}°C</p>
+                          <p className="text-gray-400 text-xs">{f.humidity}% humidity</p>
+                        </div>
+                      </motion.div>
+                    ))}
+                  </div>
+                </motion.div>
+              )}
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </div>
   );
