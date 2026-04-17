@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
+import HomePage from './pages/HomePage';
 import Dashboard from './pages/Dashboard';
 import DiseaseDetection from './pages/DiseaseDetection';
 import MandiOptimizer from './pages/MandiOptimizer';
@@ -10,23 +11,30 @@ import Register from './pages/Register';
 import Profile from './pages/Profile';
 import Weather from './pages/Weather';
 import MandiMap from './pages/MandiMap';
+import { useAuth } from './AuthContext';
 
 function App() {
+  const { user } = useAuth();
+
   return (
     <BrowserRouter>
       <div className="min-h-screen bg-gray-50">
         <Navbar />
         <Routes>
-          <Route path="/" element={<Dashboard />} />
+          {/* Public route — shows HomePage if not logged in, Dashboard if logged in */}
+          <Route path="/" element={user ? <Dashboard /> : <HomePage />} />
           <Route path="/disease" element={<DiseaseDetection />} />
           <Route path="/mandi" element={<MandiOptimizer />} />
-          <Route path="/profit" element={<ProfitTracker />} />
+          <Route path="/mandi-map" element={<MandiMap />} />
+          <Route path="/weather" element={<Weather />} />
           <Route path="/schemes" element={<Schemes />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/profile" element={<Profile />} />
-          <Route path="/weather" element={<Weather />} />
-          <Route path="/mandi-map" element={<MandiMap />} />
+          {/* Profit Tracker — only accessible after login */}
+          <Route path="/profit" element={user ? <ProfitTracker /> : <Login />} />
+          {/* Personal Dashboard — only after login */}
+          <Route path="/dashboard" element={user ? <Dashboard /> : <Login />} />
         </Routes>
       </div>
     </BrowserRouter>

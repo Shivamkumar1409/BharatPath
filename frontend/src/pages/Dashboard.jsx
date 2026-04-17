@@ -86,12 +86,12 @@ const priceData = [
 ];
 
 const quickLinks = [
-  { path: '/disease', label: 'Crop Disease', icon: '🔬', desc: 'AI leaf diagnosis', color: 'from-green-500 to-emerald-600', shadow: 'shadow-green-200' },
-  { path: '/mandi', label: 'Mandi Prices', icon: '📊', desc: 'Live govt prices', color: 'from-blue-500 to-blue-600', shadow: 'shadow-blue-200' },
-  { path: '/mandi-map', label: 'Mandi Map', icon: '🗺️', desc: 'Find nearby mandis', color: 'from-purple-500 to-purple-600', shadow: 'shadow-purple-200' },
-  { path: '/weather', label: 'Farm Weather', icon: '🌤️', desc: 'Weather forecast', color: 'from-cyan-500 to-cyan-600', shadow: 'shadow-cyan-200' },
-  { path: '/profit', label: 'Profit Tracker', icon: '💰', desc: 'Track earnings', color: 'from-yellow-500 to-orange-500', shadow: 'shadow-yellow-200' },
-  { path: '/schemes', label: 'Gov. Schemes', icon: '🏛️', desc: 'Eligible schemes', color: 'from-red-500 to-pink-500', shadow: 'shadow-red-200' },
+  { path: '/disease', label: 'Crop Disease', icon: '🔬', desc: 'AI leaf diagnosis', bg: 'bg-green-50', border: 'border-green-200', icon_bg: 'bg-green-100', text: 'text-green-700' },
+  { path: '/mandi', label: 'Mandi Prices', icon: '📊', desc: 'Live govt prices', bg: 'bg-blue-50', border: 'border-blue-200', icon_bg: 'bg-blue-100', text: 'text-blue-700' },
+  { path: '/mandi-map', label: 'Mandi Map', icon: '🗺️', desc: 'Find nearby mandis', bg: 'bg-purple-50', border: 'border-purple-200', icon_bg: 'bg-purple-100', text: 'text-purple-700' },
+  { path: '/weather', label: 'Weather', icon: '🌤️', desc: 'Farm forecast', bg: 'bg-cyan-50', border: 'border-cyan-200', icon_bg: 'bg-cyan-100', text: 'text-cyan-700' },
+  { path: '/profit', label: 'My Profit', icon: '💰', desc: 'Your farm earnings', bg: 'bg-yellow-50', border: 'border-yellow-200', icon_bg: 'bg-yellow-100', text: 'text-yellow-700' },
+  { path: '/schemes', label: 'Gov. Schemes', icon: '🏛️', desc: 'Eligible schemes', bg: 'bg-orange-50', border: 'border-orange-200', icon_bg: 'bg-orange-100', text: 'text-orange-700' },
 ];
 
 const stats = [

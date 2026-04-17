@@ -10,13 +10,13 @@ export default function Navbar() {
   const { user, logout } = useAuth();
 
   const navLinks = [
-  { path: '/', label: 'Dashboard', icon: '🏠' },
+  { path: '/', label: 'Home', icon: '🏠' },
   { path: '/disease', label: 'Crop Disease', icon: '🌿' },
   { path: '/mandi', label: 'Mandi Prices', icon: '📊' },
-  { path: '/profit', label: 'Profit Tracker', icon: '💰' },
-  { path: '/schemes', label: 'Gov. Schemes', icon: '🏛️' },
-  { path: '/weather', label: 'Weather', icon: '🌤️' },
   { path: '/mandi-map', label: 'Mandi Map', icon: '🗺️' },
+  { path: '/weather', label: 'Weather', icon: '🌤️' },
+  { path: '/schemes', label: 'Gov. Schemes', icon: '🏛️' },
+  ...(user ? [{ path: '/profit', label: 'Profit Tracker', icon: '💰' }] : []),
 ];
 
   const isActive = (path) => location.pathname === path;
