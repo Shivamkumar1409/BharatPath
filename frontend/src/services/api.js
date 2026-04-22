@@ -13,3 +13,7 @@ export const getBestMandi = (crop, quantity, district) =>
 export const getPricePrediction = (crop) =>
   API.get('/mandi/price-prediction', { params: { crop } });
 export const getAllSchemes = () => API.get('/schemes/all');
+
+export const getMSPPrices = () => API.get('/mandi/msp-prices');
+export const checkMSP = (crop, price) =>
+  API.get('/mandi/msp-check', { params: { crop, current_price: price } });

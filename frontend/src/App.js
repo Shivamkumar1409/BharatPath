@@ -12,6 +12,7 @@ import Profile from './pages/Profile';
 import Weather from './pages/Weather';
 import MandiMap from './pages/MandiMap';
 import { useAuth } from './AuthContext';
+import MSPAlert from './pages/MSPAlert';
 
 function App() {
   const { user } = useAuth();
@@ -35,6 +36,7 @@ function App() {
           <Route path="/profit" element={user ? <ProfitTracker /> : <Login />} />
           {/* Personal Dashboard — only after login */}
           <Route path="/dashboard" element={user ? <Dashboard /> : <Login />} />
+          <Route path="/msp" element={<MSPAlert />} />
         </Routes>
       </div>
     </BrowserRouter>

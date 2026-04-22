@@ -92,6 +92,7 @@ const quickLinks = [
   { path: '/weather', label: 'Weather', icon: '🌤️', desc: 'Farm forecast', bg: 'bg-cyan-50', border: 'border-cyan-200', icon_bg: 'bg-cyan-100', text: 'text-cyan-700' },
   { path: '/profit', label: 'My Profit', icon: '💰', desc: 'Your farm earnings', bg: 'bg-yellow-50', border: 'border-yellow-200', icon_bg: 'bg-yellow-100', text: 'text-yellow-700' },
   { path: '/schemes', label: 'Gov. Schemes', icon: '🏛️', desc: 'Eligible schemes', bg: 'bg-orange-50', border: 'border-orange-200', icon_bg: 'bg-orange-100', text: 'text-orange-700' },
+  { path: '/msp', label: 'MSP Alerts', icon: '📢', desc: 'Price vs MSP check', bg: 'bg-red-50', border: 'border-red-200', icon_bg: 'bg-red-100', text: 'text-red-700' },
 ];
 
 const stats = [

@@ -17,6 +17,7 @@ export default function Navbar() {
   { path: '/weather', label: 'Weather', icon: '🌤️' },
   { path: '/schemes', label: 'Gov. Schemes', icon: '🏛️' },
   ...(user ? [{ path: '/profit', label: 'Profit Tracker', icon: '💰' }] : []),
+  { path: '/msp', label: 'MSP Alerts', icon: '📢' },
 ];
 
   const isActive = (path) => location.pathname === path;
