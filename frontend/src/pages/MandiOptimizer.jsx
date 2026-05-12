@@ -19,8 +19,14 @@ export default function MandiOptimizer() {
     setLoading(true); setError(null); setResults(null);
     try {
       const res = await getBestMandi(crop, parseFloat(quantity), district);
-      res.data.error ? setError(res.data.error) : setResults(res.data);
-    } catch { setError('Could not fetch mandi data. Please try again.'); }
+      if (res.data.error) {
+        setError(res.data.error);
+      } else {
+        setResults(res.data);
+      }
+    } catch {
+      setError('Could not fetch mandi data. Please try again.');
+    }
     setLoading(false);
   };
 
@@ -29,8 +35,14 @@ export default function MandiOptimizer() {
     setPredLoading(true); setError(null);
     try {
       const res = await getPricePrediction(crop);
-      res.data.error ? setError(res.data.error) : setPrediction(res.data);
-    } catch { setError('Could not fetch price prediction.'); }
+      if (res.data.error) {
+        setError(res.data.error);
+      } else {
+        setPrediction(res.data);
+      }
+    } catch {
+      setError('Could not fetch price prediction.');
+    }
     setPredLoading(false);
   };
 
@@ -74,32 +86,42 @@ export default function MandiOptimizer() {
         {/* Input Form */}
         <motion.div
           className="bg-white rounded-2xl border border-gray-100 p-6 mb-6"
-          initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
           style={{ boxShadow: '0 4px 20px rgba(0,0,0,0.06)' }}
         >
           <h2 className="text-xl font-bold text-gray-800 mb-4">🌾 Enter Crop Details</h2>
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-600 mb-1">Crop Type</label>
-              <select value={crop}
-                onChange={(e) => { setCrop(e.target.value); setResults(null); setPrediction(null); }}
+              <select
+                value={crop}
+                onChange={(e) => { setCrop(e.target.value); setResults(null); setPrediction(null); setError(null); }}
                 className="w-full border border-gray-200 rounded-xl px-3 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400 bg-gray-50"
               >
                 <option value="">Select Crop</option>
                 {CROPS.map(c => <option key={c} value={c}>{c}</option>)}
               </select>
             </div>
+
             <div>
               <label className="block text-sm font-medium text-gray-600 mb-1">Quantity (kg)</label>
-              <input type="number" value={quantity}
+              <input
+                type="number"
+                value={quantity}
                 onChange={(e) => setQuantity(e.target.value)}
                 placeholder="e.g. 500"
+                onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
                 className="w-full border border-gray-200 rounded-xl px-3 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400 bg-gray-50"
               />
             </div>
+
             <div>
               <label className="block text-sm font-medium text-gray-600 mb-1">District (optional)</label>
-              <input type="text" value={district}
+              <input
+                type="text"
+                value={district}
                 onChange={(e) => setDistrict(e.target.value)}
                 placeholder="e.g. Delhi"
                 className="w-full border border-gray-200 rounded-xl px-3 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400 bg-gray-50"
@@ -107,46 +129,138 @@ export default function MandiOptimizer() {
             </div>
           </div>
 
-          {error && (
-            <motion.p className="text-red-500 text-sm mt-3 bg-red-50 p-2 rounded-lg"
-              initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-              ⚠️ {error}
-            </motion.p>
-          )}
+          {/* Error */}
+          <AnimatePresence>
+            {error && (
+              <motion.div
+                className="mt-3 p-3 bg-red-50 border border-red-200 rounded-xl"
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+              >
+                <p className="text-red-500 text-sm">⚠️ {error}</p>
+                <button
+                  onClick={handleSubmit}
+                  className="mt-1 text-xs text-blue-600 font-bold underline hover:no-underline"
+                >
+                  🔄 Try Again
+                </button>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
+          {/* Buttons */}
           <div className="flex flex-col md:flex-row gap-3 mt-4">
-            <motion.button onClick={handleSubmit} disabled={loading}
-              className="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition shadow-md"
-              whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
+            <motion.button
+              onClick={handleSubmit}
+              disabled={loading}
+              className={`px-8 py-3 font-bold rounded-xl transition shadow-md text-white flex items-center justify-center space-x-2 ${
+                loading ? 'bg-blue-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'
+              }`}
+              whileHover={!loading ? { scale: 1.02 } : {}}
+              whileTap={!loading ? { scale: 0.98 } : {}}
             >
-              {loading ? '🔄 Finding Best Mandi...' : '🔍 Find Best Mandi'}
+              {loading ? (
+                <>
+                  <motion.span
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+                    className="inline-block"
+                  >
+                    ⏳
+                  </motion.span>
+                  <span>Fetching live prices...</span>
+                </>
+              ) : (
+                <span>🔍 Find Best Mandi</span>
+              )}
             </motion.button>
-            <motion.button onClick={handlePrediction} disabled={predLoading}
-              className="px-8 py-3 bg-green-600 hover:bg-green-700 text-white font-bold rounded-xl transition shadow-md"
-              whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
+
+            <motion.button
+              onClick={handlePrediction}
+              disabled={predLoading}
+              className={`px-8 py-3 font-bold rounded-xl transition shadow-md text-white flex items-center justify-center space-x-2 ${
+                predLoading ? 'bg-green-400 cursor-not-allowed' : 'bg-green-600 hover:bg-green-700'
+              }`}
+              whileHover={!predLoading ? { scale: 1.02 } : {}}
+              whileTap={!predLoading ? { scale: 0.98 } : {}}
             >
-              {predLoading ? '🔄 Predicting...' : '📈 Predict Price'}
+              {predLoading ? (
+                <>
+                  <motion.span
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+                    className="inline-block"
+                  >
+                    ⏳
+                  </motion.span>
+                  <span>Predicting...</span>
+                </>
+              ) : (
+                <span>📈 Predict Price</span>
+              )}
             </motion.button>
           </div>
+
+          {/* Loading Info Message */}
+          <AnimatePresence>
+            {(loading || predLoading) && (
+              <motion.div
+                className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-xl"
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+              >
+                <div className="flex items-start space-x-3">
+                  <div className="flex space-x-1 mt-1">
+                    {[0, 1, 2].map(i => (
+                      <motion.div
+                        key={i}
+                        className="w-2 h-2 bg-blue-400 rounded-full"
+                        animate={{ y: [-3, 3, -3] }}
+                        transition={{ duration: 0.6, repeat: Infinity, delay: i * 0.2 }}
+                      />
+                    ))}
+                  </div>
+                  <div>
+                    <p className="text-blue-700 text-sm font-medium">
+                      Fetching live prices from Government of India (data.gov.in)...
+                    </p>
+                    <p className="text-blue-500 text-xs mt-0.5">
+                      ⚡ First load may take up to 30 seconds. Subsequent requests will be instant from cache.
+                    </p>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </motion.div>
 
         {/* Mandi Results */}
         <AnimatePresence>
-          {results && (
-            <motion.div className="mb-6"
-              initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
+          {results && results.recommendations && results.recommendations.length > 0 && (
+            <motion.div
+              className="mb-6"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0 }}
             >
               <div className="flex items-center justify-between mb-3">
-                <h2 className="text-xl font-bold text-gray-800">🏆 Best Mandis for {results.crop}</h2>
+                <h2 className="text-xl font-bold text-gray-800">
+                  🏆 Best Mandis for {results.crop}
+                </h2>
                 <span className="text-xs text-gray-400 bg-gray-100 px-3 py-1 rounded-full">
                   🏛️ {results.source}
                 </span>
               </div>
+
               <div className="space-y-3">
                 {results.recommendations.map((mandi, i) => (
-                  <motion.div key={i}
+                  <motion.div
+                    key={i}
                     className={`bg-white border ${medalBorders[i]} ${medalBgs[i]} rounded-2xl p-5`}
-                    initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: i * 0.1 }}
                     whileHover={{ scale: 1.01, x: 3 }}
                     style={{ boxShadow: '0 4px 15px rgba(0,0,0,0.06)' }}
@@ -165,9 +279,25 @@ export default function MandiOptimizer() {
                         <p className="text-gray-400 text-xs">per quintal</p>
                       </div>
                     </div>
+
+                    {/* MSP Alert if available */}
+                    {mandi.msp_alert && mandi.msp_alert !== 'no_msp' && (
+                      <div className={`mt-3 p-2 rounded-lg text-sm font-medium ${
+                        mandi.msp_alert === 'below'
+                          ? 'bg-red-50 text-red-600 border border-red-200'
+                          : mandi.msp_alert === 'good' || mandi.msp_alert === 'excellent'
+                          ? 'bg-green-50 text-green-600 border border-green-200'
+                          : 'bg-yellow-50 text-yellow-600 border border-yellow-200'
+                      }`}>
+                        {mandi.msp_message}
+                      </div>
+                    )}
+
                     <div className="mt-3 pt-3 border-t border-gray-200 flex justify-between items-center">
                       <span className="text-gray-500 text-sm">Revenue for {results.quantity}kg</span>
-                      <span className="font-bold text-blue-600 text-lg">₹{mandi.estimated_revenue?.toLocaleString()}</span>
+                      <span className="font-bold text-blue-600 text-lg">
+                        ₹{mandi.estimated_revenue?.toLocaleString()}
+                      </span>
                     </div>
                   </motion.div>
                 ))}
@@ -181,24 +311,31 @@ export default function MandiOptimizer() {
           {prediction && (
             <motion.div
               className="bg-white rounded-2xl border border-gray-100 p-6 mb-6"
-              initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0 }}
               style={{ boxShadow: '0 4px 20px rgba(0,0,0,0.06)' }}
             >
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-xl font-bold text-gray-800">📈 Price Prediction — {prediction.crop}</h2>
+                <h2 className="text-xl font-bold text-gray-800">
+                  📈 Price Prediction — {prediction.crop}
+                </h2>
                 <span className="text-xs text-gray-400 bg-gray-100 px-3 py-1 rounded-full">
                   🏛️ {prediction.source}
                 </span>
               </div>
+
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {[
                   { label: 'Predicted Next Price', value: `₹${prediction.predicted_price}`, sub: 'per quintal', bg: 'bg-green-50', border: 'border-green-200', text: 'text-green-600' },
                   { label: 'Price Trend', value: prediction.trend, sub: 'based on recent data', bg: 'bg-blue-50', border: 'border-blue-200', text: 'text-blue-600' },
                   { label: 'Average Price', value: `₹${prediction.average_price}`, sub: 'per quintal', bg: 'bg-yellow-50', border: 'border-yellow-200', text: 'text-yellow-600' },
                 ].map((item, i) => (
-                  <motion.div key={i}
+                  <motion.div
+                    key={i}
                     className={`${item.bg} border ${item.border} rounded-xl p-4 text-center`}
-                    initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
                     transition={{ delay: i * 0.1 }}
                     whileHover={{ scale: 1.03 }}
                   >
@@ -219,9 +356,11 @@ export default function MandiOptimizer() {
             { icon: '📅', title: 'Updated Daily', desc: 'Fresh mandi prices every day from across India', bg: 'bg-green-50', border: 'border-green-100' },
             { icon: '🤖', title: 'AI Prediction', desc: 'Machine learning forecasts future crop prices', bg: 'bg-purple-50', border: 'border-purple-100' },
           ].map((card, i) => (
-            <motion.div key={i}
+            <motion.div
+              key={i}
               className={`${card.bg} border ${card.border} rounded-xl p-4 flex items-start space-x-3`}
-              initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 + i * 0.1 }}
               whileHover={{ scale: 1.02, y: -2 }}
             >
