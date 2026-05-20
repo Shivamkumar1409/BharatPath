@@ -254,6 +254,12 @@ export default function MandiOptimizer() {
                 </span>
               </div>
 
+              {results.is_fallback && (
+                <div className="mb-3 p-2 bg-yellow-50 border border-yellow-200 rounded-xl text-xs text-yellow-700">
+                  ℹ️ Showing reference data — Live govt API is currently slow. Prices reflect recent AGMARKNET data.
+                </div>
+              )}
+
               <div className="space-y-3">
                 {results.recommendations.map((mandi, i) => (
                   <motion.div
