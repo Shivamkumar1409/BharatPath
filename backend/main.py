@@ -4,6 +4,7 @@ from database import engine
 from models import Base
 from routes import auth, disease, mandi, profit, schemes
 from routes import auth, disease, mandi, profit, schemes, weather
+from routes.weather_alerts import router as weather_alert_router
 
 Base.metadata.create_all(bind=engine)
 
@@ -27,6 +28,7 @@ app.include_router(mandi.router, prefix="/mandi", tags=["Mandi Optimizer"])
 app.include_router(profit.router, prefix="/profit", tags=["Profit Tracker"])
 app.include_router(schemes.router, prefix="/schemes", tags=["Government Schemes"])
 app.include_router(weather.router, prefix="/weather", tags=["Weather"])
+app.include_router(weather_alert_router)
 
 @app.get("/")
 def root():

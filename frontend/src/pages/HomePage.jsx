@@ -1,3 +1,4 @@
+import SmartAlerts from "../components/SmartAlerts";
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 
@@ -46,13 +47,15 @@ export default function HomePage() {
             </motion.div>
 
             <h1 className="text-5xl md:text-7xl font-black mb-4 leading-tight flex items-center justify-center space-x-4">
-            <span style={{ transform: 'scaleX(-1)', display: 'inline-block' }}>🌾</span>
-            <span>BharatPath</span>
-            <span>🌾</span>
+              <span style={{ transform: 'scaleX(-1)', display: 'inline-block' }}>🌾</span>
+              <span>BharatPath</span>
+              <span>🌾</span>
             </h1>
+
             <p className="text-2xl md:text-3xl font-bold text-green-100 mb-2">
               किसान का स्मार्ट साथी
             </p>
+
             <p className="text-green-200 text-lg mb-8 max-w-2xl mx-auto">
               AI-powered decision support system for Indian farmers —
               crop disease detection, live mandi prices, weather forecasts and government schemes
@@ -66,6 +69,7 @@ export default function HomePage() {
                   🚀 Get Started Free
                 </Link>
               </motion.div>
+
               <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.97 }}>
                 <Link to="/login"
                   className="block px-8 py-4 bg-white bg-opacity-20 hover:bg-opacity-30 text-white font-bold rounded-2xl text-lg border border-white border-opacity-40 transition"
@@ -74,6 +78,7 @@ export default function HomePage() {
                 </Link>
               </motion.div>
             </div>
+
           </motion.div>
         </div>
 
@@ -85,8 +90,14 @@ export default function HomePage() {
         </div>
       </div>
 
+      {/* Smart Weather Alerts */}
+      <div className="max-w-5xl mx-auto px-4 mt-10">
+        <SmartAlerts />
+      </div>
+
       {/* Stats */}
       <div className="max-w-5xl mx-auto px-4 py-12">
+
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-16">
           {stats.map((stat, i) => (
             <motion.div key={i}
@@ -106,8 +117,12 @@ export default function HomePage() {
         {/* Features */}
         <motion.div className="text-center mb-10"
           initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }}>
-          <h2 className="text-3xl font-black text-gray-800 mb-2">Everything a Farmer Needs</h2>
-          <p className="text-gray-500">Powered by AI and real government data</p>
+          <h2 className="text-3xl font-black text-gray-800 mb-2">
+            Everything a Farmer Needs
+          </h2>
+          <p className="text-gray-500">
+            Powered by AI and real government data
+          </p>
         </motion.div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-16">
@@ -122,73 +137,20 @@ export default function HomePage() {
               <div className={`w-12 h-12 ${f.iconBg} rounded-xl flex items-center justify-center text-2xl mb-3`}>
                 {f.icon}
               </div>
-              <h3 className="font-bold text-gray-800 mb-1">{f.title}</h3>
-              <p className="text-gray-500 text-sm leading-relaxed">{f.desc}</p>
+
+              <h3 className="font-bold text-gray-800 mb-1">
+                {f.title}
+              </h3>
+
+              <p className="text-gray-500 text-sm leading-relaxed">
+                {f.desc}
+              </p>
             </motion.div>
           ))}
         </div>
 
-        {/* Data Sources */}
-        <motion.div
-          className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-2xl border border-green-100 p-6 mb-16 text-center"
-          initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}
-        >
-          <h3 className="font-bold text-gray-800 text-lg mb-4">🏛️ Powered by Official Government Data</h3>
-          <div className="flex flex-wrap justify-center gap-4">
-            {[
-              { name: 'data.gov.in', desc: 'Mandi Prices', icon: '📊' },
-              { name: 'OpenWeatherMap', desc: 'Weather Data', icon: '🌤️' },
-              { name: 'Firebase', desc: 'Secure Auth', icon: '🔐' },
-              { name: 'Bhashini', desc: 'Hindi Translation', icon: '🇮🇳' },
-            ].map((source, i) => (
-              <div key={i} className="bg-white rounded-xl px-4 py-3 border border-green-100 flex items-center space-x-2 shadow-sm">
-                <span>{source.icon}</span>
-                <div className="text-left">
-                  <p className="font-bold text-gray-700 text-sm">{source.name}</p>
-                  <p className="text-gray-400 text-xs">{source.desc}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </motion.div>
-
-        {/* CTA */}
-        <motion.div
-          className="bg-gradient-to-r from-green-600 to-emerald-600 rounded-3xl p-10 text-center text-white"
-          initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.6 }}
-          style={{ boxShadow: '0 20px 40px rgba(22, 163, 74, 0.2)' }}
-        >
-          <h2 className="text-3xl font-black mb-2">Ready to Transform Your Farm? 🌾</h2>
-          <p className="text-green-100 mb-6">Join thousands of farmers using BharatPath</p>
-          <div className="flex flex-col md:flex-row items-center justify-center space-y-3 md:space-y-0 md:space-x-4">
-            <motion.div whileHover={{ scale: 1.05 }}>
-              <Link to="/register"
-                className="block px-8 py-3 bg-yellow-400 hover:bg-yellow-300 text-green-900 font-black rounded-2xl shadow-lg transition"
-              >
-                🚀 Create Free Account
-              </Link>
-            </motion.div>
-            <motion.div whileHover={{ scale: 1.05 }}>
-              <Link to="/mandi"
-                className="block px-8 py-3 bg-white bg-opacity-20 hover:bg-opacity-30 text-white font-bold rounded-2xl border border-white border-opacity-40 transition"
-              >
-                📊 Check Mandi Prices
-              </Link>
-            </motion.div>
-          </div>
-        </motion.div>
       </div>
 
-      {/* Footer */}
-      <div className="bg-gray-50 border-t border-gray-100 py-8 text-center">
-        <p className="text-gray-400 text-sm">
-          🌾 BharatPath — किसान का साथी | Built for Indian Farmers | MSc Informatics Project
-        </p>
-        <p className="text-gray-300 text-xs mt-1">
-          Data sourced from data.gov.in — Ministry of Agriculture, Government of India
-        </p>
-      </div>
     </div>
   );
 }
