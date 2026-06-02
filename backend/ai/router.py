@@ -71,6 +71,15 @@ async def predict(
     # Step 3 — Predict
     result = predict_crop_health(temp_path)
 
+    # Safety net — if model confidence is very low, reject
+    if result["confidence"] < 25:
+        return JSONResponse(status_code=400, content={
+            "success": False,
+            "valid_image": False,
+            "error": "Could not analyze this image. Please upload a clearer crop or leaf photo.",
+            "message": "Model confidence too low to make a reliable prediction."
+        })
+
     # Step 4 — Weather
     weather = None
     farmer_city = city or "Delhi"
