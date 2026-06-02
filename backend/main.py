@@ -1,8 +1,9 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+
 from database import engine
 from models import Base
-from routes import auth, disease, mandi, profit, schemes
+
 from routes import auth, disease, mandi, profit, schemes, weather
 
 Base.metadata.create_all(bind=engine)
@@ -21,13 +22,44 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(auth.router, prefix="/auth", tags=["Authentication"])
-app.include_router(disease.router, prefix="/disease", tags=["Disease Detection"])
-app.include_router(mandi.router, prefix="/mandi", tags=["Mandi Optimizer"])
-app.include_router(profit.router, prefix="/profit", tags=["Profit Tracker"])
-app.include_router(schemes.router, prefix="/schemes", tags=["Government Schemes"])
-app.include_router(weather.router, prefix="/weather", tags=["Weather"])
+app.include_router(
+    auth.router,
+    prefix="/auth",
+    tags=["Authentication"]
+)
+
+app.include_router(
+    disease.router,
+    prefix="/crop-health",
+    tags=["Crop Health AI"]
+)
+
+app.include_router(
+    mandi.router,
+    prefix="/mandi",
+    tags=["Mandi Optimizer"]
+)
+
+app.include_router(
+    profit.router,
+    prefix="/profit",
+    tags=["Profit Tracker"]
+)
+
+app.include_router(
+    schemes.router,
+    prefix="/schemes",
+    tags=["Government Schemes"]
+)
+
+app.include_router(
+    weather.router,
+    prefix="/weather",
+    tags=["Weather"]
+)
 
 @app.get("/")
 def root():
-    return {"message": "Bharat-Path API is running 🌾"}
+    return {
+        "message": "Bharat-Path API is running 🌾"
+    }

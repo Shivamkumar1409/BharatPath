@@ -25,11 +25,12 @@ export default function Login() {
     try {
       const res = await loginFarmer(form);
       loginWithEmail({
-        name: res.data.name,
-        email: form.email,
-        photo: null,
-        provider: 'email',
-      });
+  name: res.data.name,
+  email: res.data.email,
+  location: res.data.location,
+  photo: null,
+  provider: 'email',
+});
       setSuccess(`Welcome back, ${res.data.name}! 🌾 Redirecting...`);
       setTimeout(() => navigate('/'), 1500);
     } catch {

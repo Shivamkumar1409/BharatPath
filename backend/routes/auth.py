@@ -21,7 +21,9 @@ def login(farmer: FarmerLogin, db: Session = Depends(get_db)):
     if not db_farmer or not pwd.verify(farmer.password, db_farmer.password):
         raise HTTPException(status_code=401, detail="Invalid email or password")
     return {
-        "message": "Login successful",
-        "farmer_id": db_farmer.id,
-        "name": db_farmer.name
-    }
+    "message": "Login successful",
+    "farmer_id": db_farmer.id,
+    "name": db_farmer.name,
+    "email": db_farmer.email,
+    "location": db_farmer.location
+}
