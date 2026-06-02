@@ -1,36 +1,69 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { registerFarmer } from '../services/api';
+import { verifyOTP, resendOTP } from '../services/api';
 import { auth, googleProvider } from '../firebase';
 import { signInWithPopup } from 'firebase/auth';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const checkPasswordStrength = (password) => {
   let strength = 0;
-  let tips = [];
-  if (password.length >= 8) strength++; else tips.push('At least 8 characters');
-  if (/[A-Z]/.test(password)) strength++; else tips.push('One uppercase letter');
-  if (/[0-9]/.test(password)) strength++; else tips.push('One number');
-  if (/[^A-Za-z0-9]/.test(password)) strength++; else tips.push('One special character (!@#$)');
-  return { strength, tips };
+  if (password.length >= 8) strength++;
+  if (/[A-Z]/.test(password)) strength++;
+  if (/[0-9]/.test(password)) strength++;
+  if (/[^A-Za-z0-9]/.test(password)) strength++;
+  return strength;
 };
 
-const strengthColors = ['bg-red-400', 'bg-orange-400', 'bg-yellow-400', 'bg-green-400', 'bg-green-600'];
+const strengthColors = ['bg-gray-200', 'bg-red-400', 'bg-orange-400', 'bg-yellow-400', 'bg-green-500'];
 const strengthLabels = ['', 'Weak', 'Fair', 'Good', 'Strong'];
+const strengthTextColors = ['', 'text-red-500', 'text-orange-500', 'text-yellow-600', 'text-green-600'];
 
 export default function Register() {
+  const [step, setStep] = useState('register'); // 'register' | 'otp'
   const [form, setForm] = useState({ name: '', email: '', password: '' });
+  const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
+  const [resending, setResending] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
-  const { strength, tips } = checkPasswordStrength(form.password);
+  const strength = checkPasswordStrength(form.password);
 
-  const handleSubmit = async () => {
+  // ── OTP input handler ─────────────────────────────────────────
+  const handleOtpChange = (value, index) => {
+    if (!/^\d*$/.test(value)) return; // only digits
+    const newOtp = [...otp];
+    newOtp[index] = value.slice(-1);
+    setOtp(newOtp);
+    // Auto-focus next
+    if (value && index < 5) {
+      document.getElementById(`otp-${index + 1}`)?.focus();
+    }
+  };
+
+  const handleOtpKeyDown = (e, index) => {
+    if (e.key === 'Backspace' && !otp[index] && index > 0) {
+      document.getElementById(`otp-${index - 1}`)?.focus();
+    }
+  };
+
+  const handleOtpPaste = (e) => {
+    e.preventDefault();
+    const pasted = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, 6);
+    const newOtp = [...otp];
+    pasted.split('').forEach((digit, i) => { newOtp[i] = digit; });
+    setOtp(newOtp);
+    document.getElementById(`otp-${Math.min(pasted.length, 5)}`)?.focus();
+  };
+
+  // ── Register step ─────────────────────────────────────────────
+  const handleRegister = async () => {
     if (!form.name || !form.email || !form.password) {
-      setError('Name, email and password are required');
+      setError('All fields are required');
       return;
     }
     if (strength < 2) {
@@ -40,13 +73,63 @@ export default function Register() {
     setLoading(true);
     setError(null);
     try {
-      await registerFarmer({ name: form.name, email: form.email, password: form.password });
-      setSuccess('Registration successful! Redirecting... 🎉');
-      setTimeout(() => navigate('/login'), 1500);
+      const res = await registerFarmer({
+        name: form.name,
+        email: form.email,
+        password: form.password
+      });
+      if (res.data.otp_sent) {
+        setSuccess(`OTP sent to ${form.email} ✅`);
+      } else {
+        setSuccess('OTP generated — check server terminal if email not received');
+      }
+      setStep('otp');
     } catch (err) {
-      setError(err.response?.data?.detail || 'Registration failed. Please try again.');
+      const msg = err.response?.data?.detail || '';
+      if (msg.includes('already registered')) {
+        setError('This email is already registered. Please login instead.');
+      } else {
+        setError(msg || 'Registration failed. Please try again.');
+      }
     }
     setLoading(false);
+  };
+
+  // ── OTP verify step ───────────────────────────────────────────
+  const handleVerifyOtp = async () => {
+    const otpString = otp.join('');
+    if (otpString.length < 6) {
+      setError('Please enter the complete 6-digit OTP');
+      return;
+    }
+    setLoading(true);
+    setError(null);
+    try {
+      await verifyOTP(form.email, otpString);
+      setSuccess('Email verified! Redirecting to login... 🎉');
+      setTimeout(() => navigate('/login'), 2000);
+    } catch (err) {
+      const msg = err.response?.data?.detail || 'Invalid OTP. Please try again.';
+      setError(msg);
+      setOtp(['', '', '', '', '', '']);
+      document.getElementById('otp-0')?.focus();
+    }
+    setLoading(false);
+  };
+
+  // ── Resend OTP ────────────────────────────────────────────────
+  const handleResend = async () => {
+    setResending(true);
+    setError(null);
+    try {
+      await resendOTP(form.email);
+      setSuccess('New OTP sent! Check your email.');
+      setOtp(['', '', '', '', '', '']);
+      setTimeout(() => setSuccess(null), 4000);
+    } catch {
+      setError('Failed to resend OTP. Please try again.');
+    }
+    setResending(false);
   };
 
   const handleGoogleRegister = async () => {
@@ -64,155 +147,180 @@ export default function Register() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-emerald-50 flex items-center justify-center px-4 py-8 relative overflow-hidden">
-
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute -top-32 -right-32 w-96 h-96 bg-green-100 rounded-full opacity-40" />
         <div className="absolute -bottom-32 -left-32 w-80 h-80 bg-emerald-100 rounded-full opacity-40" />
       </div>
 
-      <div className="bg-white rounded-3xl shadow-xl p-8 w-full max-w-md relative z-10"
+      <motion.div className="bg-white rounded-3xl shadow-xl p-8 w-full max-w-md relative z-10"
+        initial={{ opacity: 0, y: 40, scale: 0.95 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
         style={{ boxShadow: '0 20px 60px rgba(0,0,0,0.08)' }}>
 
         {/* Logo */}
         <div className="text-center mb-6">
-          <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center text-3xl mx-auto mb-3 shadow-lg">
-            🌾
-          </div>
+          <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center text-3xl mx-auto mb-3 shadow-lg">🌾</div>
           <h1 className="text-2xl font-black text-green-700">BharatPath</h1>
           <p className="text-gray-400 text-sm">किसान का साथी</p>
         </div>
 
-        <h2 className="text-xl font-bold text-gray-800 mb-2 text-center">Create Your Account 🌱</h2>
-        <p className="text-gray-400 text-xs text-center mb-5">
-          Complete your farm profile after registration for personalized recommendations
-        </p>
+        {/* Messages */}
+        <AnimatePresence>
+          {success && (
+            <motion.div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-xl text-green-700 text-sm text-center"
+              initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }}>
+              {success}
+            </motion.div>
+          )}
+          {error && (
+            <motion.div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-xl text-red-500 text-sm"
+              initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }}>
+              ⚠️ {error}
+            </motion.div>
+          )}
+        </AnimatePresence>
 
-        {success && (
-          <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-xl text-green-700 text-sm text-center">
-            {success}
-          </div>
-        )}
-        {error && (
-          <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-xl text-red-500 text-sm">
-            ⚠️ {error}
-          </div>
-        )}
+        {/* ── STEP 1: Register Form ── */}
+        <AnimatePresence mode="wait">
+          {step === 'register' && (
+            <motion.div key="register"
+              initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
 
-        {/* Google Button */}
-        <button onClick={handleGoogleRegister} disabled={googleLoading}
-          className="w-full flex items-center justify-center space-x-3 py-3 border-2 border-gray-100 hover:border-green-300 rounded-2xl transition mb-4 bg-white hover:bg-green-50">
-          <img src="https://www.google.com/favicon.ico" alt="Google" className="w-5 h-5" />
-          <span className="font-semibold text-gray-600">
-            {googleLoading ? 'Signing in...' : 'Continue with Google'}
-          </span>
-        </button>
+              <h2 className="text-xl font-bold text-gray-800 mb-1 text-center">Create Your Account 🌱</h2>
+              <p className="text-gray-400 text-xs text-center mb-5">Complete your farm profile after registration</p>
 
-        {/* Divider */}
-        <div className="flex items-center space-x-3 mb-4">
-          <div className="flex-1 h-px bg-gray-100"></div>
-          <span className="text-gray-400 text-xs">or register with email</span>
-          <div className="flex-1 h-px bg-gray-100"></div>
-        </div>
-
-        <div className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-600 mb-1">Full Name *</label>
-            <input type="text" placeholder="e.g. Ramesh Kumar"
-              value={form.name}
-              onChange={(e) => setForm({ ...form, name: e.target.value })}
-              className="w-full border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-green-400 bg-gray-50"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-600 mb-1">Email Address *</label>
-            <input type="email" placeholder="farmer@example.com"
-              value={form.email}
-              onChange={(e) => setForm({ ...form, email: e.target.value })}
-              className="w-full border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-green-400 bg-gray-50"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-600 mb-1">Password *</label>
-            <div className="relative">
-              <input
-                type={showPassword ? 'text' : 'password'}
-                placeholder="Create a strong password"
-                value={form.password}
-                onChange={(e) => setForm({ ...form, password: e.target.value })}
-                className="w-full border border-gray-200 rounded-xl px-4 py-3 pr-10 focus:outline-none focus:ring-2 focus:ring-green-400 bg-gray-50"
-              />
-              <button type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-3 text-gray-400 hover:text-gray-600 text-sm">
-                {showPassword ? '🙈' : '👁️'}
+              {/* Google */}
+              <button onClick={handleGoogleRegister} disabled={googleLoading}
+                className="w-full flex items-center justify-center space-x-3 py-3 border-2 border-gray-100 hover:border-green-300 rounded-2xl transition mb-4 bg-white hover:bg-green-50">
+                <img src="https://www.google.com/favicon.ico" alt="Google" className="w-5 h-5" />
+                <span className="font-semibold text-gray-600">
+                  {googleLoading ? 'Signing in...' : 'Continue with Google'}
+                </span>
               </button>
-            </div>
 
-            {/* Password Strength Bar */}
-            {form.password.length > 0 && (
-              <div className="mt-2">
-                <div className="flex space-x-1 mb-1">
-                  {[1, 2, 3, 4].map(i => (
-                    <div key={i}
-                      className={`h-1.5 flex-1 rounded-full transition-all ${
-                        i <= strength ? strengthColors[strength] : 'bg-gray-200'
-                      }`} />
-                  ))}
+              <div className="flex items-center space-x-3 mb-4">
+                <div className="flex-1 h-px bg-gray-100"></div>
+                <span className="text-gray-400 text-xs">or register with email</span>
+                <div className="flex-1 h-px bg-gray-100"></div>
+              </div>
+
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-600 mb-1">Full Name *</label>
+                  <input type="text" placeholder="e.g. Ramesh Kumar" value={form.name}
+                    onChange={(e) => setForm({ ...form, name: e.target.value })}
+                    className="w-full border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-green-400 bg-gray-50" />
                 </div>
-                <div className="flex justify-between items-center">
-                  <span className={`text-xs font-medium ${
-                    strength <= 1 ? 'text-red-500' :
-                    strength === 2 ? 'text-yellow-500' :
-                    strength === 3 ? 'text-green-500' : 'text-green-600'
-                  }`}>
-                    {strengthLabels[strength]}
-                  </span>
-                  {tips.length > 0 && (
-                    <span className="text-xs text-gray-400">
-                      Add: {tips[0]}
-                    </span>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-600 mb-1">Email Address *</label>
+                  <input type="email" placeholder="farmer@example.com" value={form.email}
+                    onChange={(e) => setForm({ ...form, email: e.target.value })}
+                    className="w-full border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-green-400 bg-gray-50" />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-600 mb-1">Password *</label>
+                  <div className="relative">
+                    <input type={showPassword ? 'text' : 'password'}
+                      placeholder="Create a strong password" value={form.password}
+                      onChange={(e) => setForm({ ...form, password: e.target.value })}
+                      onKeyDown={(e) => e.key === 'Enter' && handleRegister()}
+                      className="w-full border border-gray-200 rounded-xl px-4 py-3 pr-10 focus:outline-none focus:ring-2 focus:ring-green-400 bg-gray-50" />
+                    <button type="button" onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-3 text-gray-400 hover:text-gray-600 text-sm">
+                      {showPassword ? '🙈' : '👁️'}
+                    </button>
+                  </div>
+
+                  {form.password.length > 0 && (
+                    <div className="mt-2">
+                      <div className="flex space-x-1 mb-1">
+                        {[1, 2, 3, 4].map(i => (
+                          <div key={i} className={`h-1.5 flex-1 rounded-full transition-all ${i <= strength ? strengthColors[strength] : 'bg-gray-200'}`} />
+                        ))}
+                      </div>
+                      <span className={`text-xs font-medium ${strengthTextColors[strength]}`}>
+                        {strengthLabels[strength]}
+                      </span>
+                    </div>
                   )}
                 </div>
+
+                <button onClick={handleRegister} disabled={loading}
+                  className={`w-full py-3 font-bold rounded-xl transition shadow-md text-white ${
+                    loading ? 'bg-green-400 cursor-not-allowed' : 'bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500'
+                  }`}>
+                  {loading ? '🔄 Sending OTP...' : '🌾 Create Account'}
+                </button>
               </div>
-            )}
 
-            {/* Strong Password Suggestions */}
-            {form.password.length > 0 && strength < 4 && (
-              <div className="mt-2 p-2 bg-blue-50 border border-blue-100 rounded-xl">
-                <p className="text-xs text-blue-600 font-medium mb-1">💡 Strong password tips:</p>
-                <ul className="space-y-0.5">
-                  {[
-                    { check: form.password.length >= 8, label: '✓ At least 8 characters' },
-                    { check: /[A-Z]/.test(form.password), label: '✓ One uppercase letter (A-Z)' },
-                    { check: /[0-9]/.test(form.password), label: '✓ One number (0-9)' },
-                    { check: /[^A-Za-z0-9]/.test(form.password), label: '✓ One special character (!@#$)' },
-                  ].map((item, i) => (
-                    <li key={i} className={`text-xs ${item.check ? 'text-green-600' : 'text-gray-400'}`}>
-                      {item.check ? '✅' : '○'} {item.label}
-                    </li>
-                  ))}
-                </ul>
+              <p className="text-center text-gray-400 text-sm mt-5">
+                Already have an account?{' '}
+                <Link to="/login" className="text-green-600 font-bold hover:underline">Login here</Link>
+              </p>
+            </motion.div>
+          )}
+
+          {/* ── STEP 2: OTP Verification ── */}
+          {step === 'otp' && (
+            <motion.div key="otp"
+              initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
+
+              <div className="text-center mb-6">
+                <div className="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center text-3xl mx-auto mb-3">📧</div>
+                <h2 className="text-xl font-bold text-gray-800 mb-1">Verify Your Email</h2>
+                <p className="text-gray-400 text-sm">We sent a 6-digit OTP to</p>
+                <p className="text-green-600 font-bold text-sm">{form.email}</p>
               </div>
-            )}
-          </div>
 
-          <button onClick={handleSubmit} disabled={loading}
-            className="w-full py-3 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white font-bold rounded-xl transition shadow-md">
-            {loading ? '🔄 Registering...' : '🌾 Create Account'}
-          </button>
+              {/* OTP Input Boxes */}
+              <div className="flex justify-center space-x-3 mb-6" onPaste={handleOtpPaste}>
+                {otp.map((digit, index) => (
+                  <input
+                    key={index}
+                    id={`otp-${index}`}
+                    type="text"
+                    inputMode="numeric"
+                    maxLength={1}
+                    value={digit}
+                    onChange={(e) => handleOtpChange(e.target.value, index)}
+                    onKeyDown={(e) => handleOtpKeyDown(e, index)}
+                    className={`w-12 h-14 text-center text-2xl font-black rounded-xl border-2 focus:outline-none focus:ring-2 focus:ring-green-400 transition ${
+                      digit ? 'border-green-400 bg-green-50 text-green-700' : 'border-gray-200 bg-gray-50 text-gray-800'
+                    }`}
+                  />
+                ))}
+              </div>
 
-          <p className="text-center text-gray-400 text-xs">
-            After registration, complete your farm profile to get personalized scheme recommendations 🌾
-          </p>
-        </div>
+              <button onClick={handleVerifyOtp} disabled={loading || otp.join('').length < 6}
+                className={`w-full py-3 font-bold rounded-xl transition text-white ${
+                  otp.join('').length < 6 || loading
+                    ? 'bg-gray-300 cursor-not-allowed'
+                    : 'bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500'
+                }`}>
+                {loading ? '🔄 Verifying...' : '✅ Verify OTP'}
+              </button>
 
-        <p className="text-center text-gray-400 text-sm mt-5">
-          Already have an account?{' '}
-          <Link to="/login" className="text-green-600 font-bold hover:underline">Login here</Link>
-        </p>
-      </div>
+              {/* Resend + Back */}
+              <div className="flex items-center justify-between mt-4">
+                <button onClick={() => { setStep('register'); setError(null); setSuccess(null); setOtp(['','','','','','']); }}
+                  className="text-gray-400 text-sm hover:text-gray-600">
+                  ← Change Email
+                </button>
+                <button onClick={handleResend} disabled={resending}
+                  className="text-green-600 text-sm font-medium hover:underline">
+                  {resending ? 'Resending...' : '🔄 Resend OTP'}
+                </button>
+              </div>
+
+              <p className="text-center text-gray-400 text-xs mt-4">
+                OTP is valid for 10 minutes
+              </p>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </motion.div>
     </div>
   );
 }

@@ -17,3 +17,16 @@ export const getAllSchemes = () => API.get('/schemes/all');
 export const getMSPPrices = () => API.get('/mandi/msp-prices');
 export const checkMSP = (crop, price) =>
   API.get('/mandi/msp-check', { params: { crop, current_price: price } });
+
+// Profile API
+export const saveProfile = (data) => API.post('/profile/save', data);
+export const getProfile = (email) => API.get(`/profile/get/${encodeURIComponent(email)}`);
+
+// Profit API  
+export const addProfitRecord = (data) => API.post('/profit/add', data);
+export const getProfitRecords = (email) => API.get(`/profit/get/${encodeURIComponent(email)}`);
+export const deleteProfitRecord = (id) => API.delete(`/profit/delete/${id}`);
+
+// Auth API
+export const verifyOTP = (email, otp) => API.post('/auth/verify-otp', { email, otp });
+export const resendOTP = (email) => API.post('/auth/resend-otp', { email });

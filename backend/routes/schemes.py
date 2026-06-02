@@ -1,7 +1,15 @@
-from fastapi import APIRouter
+from fastapi import APIRouter  # 👈 Added this import
+from pydantic import BaseModel, EmailStr
+from typing import Optional
 
+# 👈 Initialized the router so main.py doesn't crash
 router = APIRouter()
 
-@router.get("/test")
-def schemes_test():
-    return {"message": "Schemes route working"}
+class FarmerCreate(BaseModel):
+    name: str
+    email: EmailStr
+    password: str
+
+class FarmerLogin(BaseModel):
+    email: EmailStr
+    password: str
