@@ -11,7 +11,7 @@ app = FastAPI(title="BharatPath API")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    allow_origins=["*"],  # 💡 Changed from localhost to ["*"] to allow your live frontend to connect securely
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
