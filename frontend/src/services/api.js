@@ -6,7 +6,9 @@ const API = axios.create({
 
 export const registerFarmer = (data) => API.post('/auth/register', data);
 export const loginFarmer = (data) => API.post('/auth/login', data);
-export const detectDisease = (formData) => API.post('/crop-health/predict', formData);
+export const detectDisease = (formData) => API.post('/disease/predict', formData, {
+  headers: { 'Content-Type': 'multipart/form-data' }
+});
 export const getBestMandi = (crop, quantity, district) =>
   API.get('/mandi/best-mandi', { params: { crop, quantity, farmer_district: district } });
 
