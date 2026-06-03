@@ -12,7 +12,6 @@ pydantic
 email-validator
 python-multipart
 pillow
-tensorflow-cpu==2.18.0
-keras
 pandas
 scipy
+python-jose[cryptography]
