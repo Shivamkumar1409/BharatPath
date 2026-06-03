@@ -26,5 +26,3 @@ Thumbs.db
 
 # VS Code
 .vscode/
-
-frontend/src/firebase.js
