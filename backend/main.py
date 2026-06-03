@@ -1,14 +1,14 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from backend.database import engine, Base
-import backend.models as models
-from backend.routes import auth, disease, mandi, profit, schemes, weather, profile
+from database import engine, Base
+import models  # 💡 Fixed: removed 'backend.'
+from routes import auth, disease, mandi, profit, schemes, weather, profile  # 💡 Fixed: removed 'backend.'
 
 app = FastAPI(title="BharatPath API")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # 💡 Changed from localhost to ["*"] to allow your live frontend to connect securely
+    allow_origins=["*"],  
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
