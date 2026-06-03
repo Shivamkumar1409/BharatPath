@@ -14,7 +14,6 @@ class FarmerProfile(Base):
     __tablename__ = "farmer_profiles"
     id = Column(Integer, primary_key=True, index=True)
     email = Column(String, unique=True, index=True, nullable=False)
-    # Farm Details
     state = Column(String, nullable=True)
     district = Column(String, nullable=True)
     village = Column(String, nullable=True)
@@ -27,7 +26,6 @@ class FarmerProfile(Base):
     farming_experience = Column(String, nullable=True)
     organic_certified = Column(Boolean, default=False)
     soil_health_card = Column(Boolean, default=False)
-    # Financial Details
     annual_income = Column(String, nullable=True)
     farming_capacity = Column(String, nullable=True)
     has_loan = Column(Boolean, default=False)
@@ -40,7 +38,7 @@ class ProfitRecord(Base):
     id = Column(Integer, primary_key=True, index=True)
     email = Column(String, index=True, nullable=False)
     crop = Column(String, nullable=False)
-    type = Column(String, nullable=False)  # revenue or expense
+    type = Column(String, nullable=False)
     amount = Column(Float, nullable=False)
     note = Column(String, nullable=True)
     date = Column(String, nullable=True)

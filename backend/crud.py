@@ -19,8 +19,7 @@ def create_farmer(db: Session, farmer: FarmerCreate):
     db_farmer = Farmer(
         name=farmer.name,
         email=farmer.email,
-        hashed_password=hashed,
-        is_verified=False
+        hashed_password=hashed
     )
     db.add(db_farmer)
     db.commit()
