@@ -1,7 +1,1 @@
-from fastapi import APIRouter
-
-router = APIRouter()
-
-@router.get("/test")
-def disease_test():
-    return {"message": "Disease route working"}
+from ai.router import router

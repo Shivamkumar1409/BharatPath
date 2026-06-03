@@ -115,7 +115,16 @@ def login(farmer: FarmerLogin, db: Session = Depends(get_db)):
     if not verify_password(farmer.password, db_farmer.hashed_password):
         raise HTTPException(status_code=401, detail="Invalid email or password")
     return {
+<<<<<<< HEAD
         "message": "Login successful",
         "name": db_farmer.name,
         "email": db_farmer.email
     }
+=======
+    "message": "Login successful",
+    "farmer_id": db_farmer.id,
+    "name": db_farmer.name,
+    "email": db_farmer.email,
+    "location": db_farmer.location
+}
+>>>>>>> AI-CROP-HEALTH

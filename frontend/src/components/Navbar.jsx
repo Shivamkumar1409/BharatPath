@@ -14,7 +14,7 @@ export default function Navbar() {
 
   const navLinks = [
     { path: '/', label: 'Home', icon: '🏠' },
-    { path: '/disease', label: 'Crop Disease', icon: '🌿' },
+    { path: '/disease', label: 'Crop Health', icon: '🌿' },
     { path: '/mandi', label: 'Mandi Prices', icon: '📊' },
     { path: '/mandi-map', label: 'Mandi Map', icon: '🗺️' },
     { path: '/weather', label: 'Weather', icon: '🌤️' },
