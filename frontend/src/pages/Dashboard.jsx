@@ -53,7 +53,8 @@ function ThreeBackground() {
 
     return () => {
       cancelAnimationFrame(animId);
-      if (mountRef.current) mountRef.current.removeChild(renderer.domElement);
+      const mount = mountRef.current;
+      if (mount) mount.removeChild(renderer.domElement);
       renderer.dispose();
     };
   }, []);

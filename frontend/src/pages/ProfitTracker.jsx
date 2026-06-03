@@ -17,6 +17,7 @@ export default function ProfitTracker() {
 
   useEffect(() => {
     if (user?.email) fetchRecords();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
   const fetchRecords = async () => {
