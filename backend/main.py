@@ -1,11 +1,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from database import engine, Base
-import models
-
-Base.metadata.create_all(bind=engine)
-
-from routes import auth, disease, mandi, profit, schemes, weather, profile
+from backend.database import engine, Base
+import backend.models as models
+from backend.routes import auth, disease, mandi, profit, schemes, weather, profile
 
 app = FastAPI(title="BharatPath API")
 
