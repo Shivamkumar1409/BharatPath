@@ -41,7 +41,7 @@ def generate_alert(weather_data):
         alerts.append("🔥 Extreme heat detected. Increase irrigation.")
 
     if humidity > 85:
-        alerts.append("🌫️ High humidity may cause fungal diseases.")
+        alerts.append("🌫️ High humidity may cause fungal crophealths.")
 
     if weather == "Rain":
         alerts.append("🌧️ Rain expected. Avoid pesticide spraying.")

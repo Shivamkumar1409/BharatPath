@@ -65,7 +65,7 @@ def get_farming_advice(condition: str, temp: float, humidity: int) -> str:
     elif "thunderstorm" in condition:
         return "⛈️ Thunderstorm warning — secure your farm equipment and avoid outdoor work."
     elif humidity > 80:
-        return "💧 High humidity — watch out for fungal diseases. Ensure proper crop ventilation."
+        return "💧 High humidity — watch out for fungal crophealths. Ensure proper crop ventilation."
     elif humidity < 30:
         return "🌵 Low humidity — increase irrigation frequency to prevent crop stress."
     else:

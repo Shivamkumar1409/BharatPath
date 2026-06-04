@@ -16,7 +16,7 @@
 
 Bharat-Path is an MSc Informatics project that integrates multiple
 AI and data technologies to help farmers make better decisions.
-The platform provides crop disease detection, market price 
+The platform provides crop crop health analysis, market price 
 optimization, price trend prediction, farm profit analytics, 
 and government scheme awareness — all in one place.
 
@@ -26,7 +26,7 @@ and government scheme awareness — all in one place.
 
 | Feature | Description |
 |--------|-------------|
-| 🔬 AI Crop Disease Detection | Upload a leaf image and get instant disease diagnosis with treatment suggestions |
+| 🔬 AI Crop crop health analysis | Upload a leaf image and get instant crophealth diagnosis with treatment suggestions |
 | 📊 Smart Mandi Optimizer | Find the best market to sell your crop for maximum profit |
 | 📈 Price Trend Prediction | Forecast future crop prices using machine learning |
 | 💰 Profit Tracker | Record expenses and sales, calculate net farm profit |
@@ -53,7 +53,7 @@ and government scheme awareness — all in one place.
 
 ### AI / Machine Learning
 - **TensorFlow / Keras** — Deep learning framework
-- **MobileNetV2** — Transfer learning for crop disease detection
+- **MobileNetV2** — Transfer learning for crop crop health analysis
 - **Scikit-learn** — Linear regression for price prediction
 - **OpenCV** — Image processing
 - **Pandas / NumPy** — Data manipulation
@@ -77,7 +77,7 @@ BharatPath/
 │   ├── routes/
 │   │   ├── __init__.py
 │   │   ├── auth.py             # Farmer registration & login
-│   │   ├── disease.py          # Crop disease detection
+│   │   ├── .py          # Crop crop health analysis
 │   │   ├── mandi.py            # Mandi optimizer & price prediction
 │   │   ├── profit.py           # Profit tracker
 │   │   └── schemes.py          # Government schemes
@@ -160,12 +160,12 @@ Frontend runs at: `http://localhost:3000`
 
 ## 🤖 AI Model
 
-The crop disease detection model uses **MobileNetV2** with transfer
+The crop crop health analysis model uses **MobileNetV2** with transfer
 learning, trained on the **PlantVillage Dataset** (50,000+ images).
 
 | Model | Algorithm | Library |
 |-------|-----------|---------|
-| Disease Detection | MobileNetV2 (Transfer Learning) | TensorFlow/Keras |
+| crop health analysis | MobileNetV2 (Transfer Learning) | TensorFlow/Keras |
 | Price Prediction | Linear Regression | Scikit-learn |
 
 Training is done on **Google Colab** using free GPU.
@@ -180,7 +180,7 @@ due to its large size — train it using `ai-model/train_model.py`.
 |--------|----------|-------------|
 | POST | `/auth/register` | Register a new farmer |
 | POST | `/auth/login` | Farmer login |
-| POST | `/disease/detect` | Detect crop disease from image |
+| POST | `//detect` | Detect crop crophealth from image |
 | POST | `/mandi/best-mandi` | Get best mandi recommendation |
 | GET | `/mandi/price-prediction` | Get price trend prediction |
 | GET | `/schemes/all` | Get all government schemes |
@@ -194,7 +194,7 @@ due to its large size — train it using `ai-model/train_model.py`.
 
 ## 📊 Data Sources
 
-- **PlantVillage Dataset** — Crop disease images (Kaggle)
+- **PlantVillage Dataset** — Crop crophealth images (Kaggle)
 - **AGMARKNET** — Government mandi price database
 - **OpenWeatherMap API** — Weather data
 

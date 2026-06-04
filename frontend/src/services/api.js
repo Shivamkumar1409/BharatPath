@@ -1,14 +1,18 @@
 import axios from 'axios';
 
 const API = axios.create({
-  baseURL: 'http://localhost:8000',
+  // 💡 FIXED: Now it will use your live Render URL on Vercel, but fallback to localhost on your MacBook!
+  baseURL: process.env.REACT_APP_API_URL || 'http://localhost:8000', 
 });
 
 export const registerFarmer = (data) => API.post('/auth/register', data);
 export const loginFarmer = (data) => API.post('/auth/login', data);
-export const detectDisease = (formData) => API.post('/disease/predict', formData, {
+
+// 💡 FIXED: Endpoint updated to match the new backend /crophealth prefix
+export const analyzeCropHealth = (formData) => API.post('/crophealth/predict', formData, {
   headers: { 'Content-Type': 'multipart/form-data' }
 });
+
 export const getBestMandi = (crop, quantity, district) =>
   API.get('/mandi/best-mandi', { params: { crop, quantity, farmer_district: district } });
 

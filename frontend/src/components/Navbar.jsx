@@ -14,7 +14,7 @@ export default function Navbar() {
 
   const navLinks = [
     { path: '/', label: 'Home', icon: '🏠' },
-    { path: '/disease', label: 'Crop Health', icon: '🌿' },
+    { path: '/crop-health', label: 'Crop Health', icon: '🌿' },
     { path: '/mandi', label: 'Mandi Prices', icon: '📊' },
     { path: '/mandi-map', label: 'Mandi Map', icon: '🗺️' },
     { path: '/weather', label: 'Weather', icon: '🌤️' },
@@ -86,19 +86,14 @@ export default function Navbar() {
           <div className="hidden md:flex items-center space-x-2">
 
             {/* Language Selector */}
-
             <select
-
               onChange={(e) => {
 
                 const lang = e.target.value;
 
-                // Reset back to English
                 if (lang === "en") {
-
                   document.cookie = "googtrans=/en/en";
                   window.location.reload();
-
                   return;
                 }
 
@@ -107,12 +102,9 @@ export default function Navbar() {
                   const combo = document.querySelector(".goog-te-combo");
 
                   if (combo) {
-
                     combo.value = lang;
                     combo.dispatchEvent(new Event("change"));
-
                     clearInterval(interval);
-
                   }
 
                 }, 500);
@@ -123,25 +115,15 @@ export default function Navbar() {
             >
 
               <option value="">🌐 Language</option>
-
               <option value="en">English</option>
-
               <option value="hi">Hindi</option>
-
               <option value="mr">Marathi</option>
-
               <option value="gu">Gujarati</option>
-
               <option value="pa">Punjabi</option>
-
               <option value="ta">Tamil</option>
-
               <option value="te">Telugu</option>
-
               <option value="bn">Bengali</option>
-
               <option value="kn">Kannada</option>
-
               <option value="ml">Malayalam</option>
 
             </select>
@@ -167,17 +149,13 @@ export default function Navbar() {
                   ) : (
 
                     <div className="w-8 h-8 rounded-full bg-yellow-400 flex items-center justify-center text-green-900 font-bold text-sm">
-
                       {user.name?.charAt(0).toUpperCase()}
-
                     </div>
 
                   )}
 
                   <span className="text-white text-sm font-medium">
-
                     {user.name?.split(' ')[0]}
-
                   </span>
 
                   <span className="text-green-200 text-xs">▼</span>
@@ -190,19 +168,8 @@ export default function Navbar() {
                   <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-100 z-50">
 
                     <div className="px-4 py-3 border-b border-gray-100">
-
-                      <p className="font-bold text-gray-800 text-sm">
-
-                        {user.name}
-
-                      </p>
-
-                      <p className="text-gray-500 text-xs truncate">
-
-                        {user.email}
-
-                      </p>
-
+                      <p className="font-bold text-gray-800 text-sm">{user.name}</p>
+                      <p className="text-gray-500 text-xs truncate">{user.email}</p>
                     </div>
 
                     <Link
@@ -210,22 +177,16 @@ export default function Navbar() {
                       onClick={() => setDropdownOpen(false)}
                       className="flex items-center space-x-2 px-4 py-3 text-sm text-gray-700 hover:bg-green-50 transition"
                     >
-
                       <span>👤</span>
-
                       <span>My Profile</span>
-
                     </Link>
 
                     <button
                       onClick={handleLogout}
                       className="w-full flex items-center space-x-2 px-4 py-3 text-sm text-red-600 hover:bg-red-50 transition rounded-b-xl"
                     >
-
                       <span>🚪</span>
-
                       <span>Logout</span>
-
                     </button>
 
                   </div>
@@ -263,13 +224,7 @@ export default function Navbar() {
             onClick={() => setMenuOpen(!menuOpen)}
             className="md:hidden text-white"
           >
-
-            <span className="text-2xl">
-
-              {menuOpen ? '✕' : '☰'}
-
-            </span>
-
+            <span className="text-2xl">{menuOpen ? '✕' : '☰'}</span>
           </button>
 
         </div>
@@ -291,11 +246,8 @@ export default function Navbar() {
                     : 'text-green-100 hover:bg-green-600'
                 }`}
               >
-
                 <span>{link.icon}</span>
-
                 <span>{link.label}</span>
-
               </Link>
 
             ))}

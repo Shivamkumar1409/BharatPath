@@ -135,7 +135,7 @@ def generate_risk_analysis(
         ]:
 
             alerts.append(
-                "⚠ Wind may increase disease spread risk."
+                "⚠ Wind may increase crophealth spread risk."
             )
 
     # =====================================================
@@ -161,7 +161,7 @@ def generate_risk_analysis(
         )
 
         recommendations.append(
-            "Inspect disease spread immediately."
+            "Inspect crophealth spread immediately."
         )
 
     elif health_condition == "Severe Stress":

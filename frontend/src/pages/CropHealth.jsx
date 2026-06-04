@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { detectDisease } from '../services/api';
+import { analyzeCropHealth } from '../services/api';
 
-export default function DiseaseDetection() {
+export default function CropHealth() {
   const [file, setFile] = useState(null);
   const [preview, setPreview] = useState(null);
   const [city, setCity] = useState('Delhi');
@@ -40,7 +40,7 @@ export default function DiseaseDetection() {
     setError(null);
     setResult(null);
     try {
-      const res = await detectDisease(formData);
+      const res = await analyzeCropHealth(formData);
       if (!res.data.success) {
         setError(res.data.error || 'Detection failed. Please try again.');
       } else {
@@ -93,12 +93,12 @@ export default function DiseaseDetection() {
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
             <h1 className="text-4xl font-black mb-2">
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-200 to-yellow-200">
-                🔬 AI Crop Health Detection
+                🔬 AI Crop Health Analysis
               </span>
             </h1>
-            <p className="text-green-200">Advanced MobileNetV2 pipeline — disease detection, risk analysis & weather-aware recommendations</p>
+            <p className="text-green-200">Advanced EfficientNetV2-B0 pipeline — crop health analysis, risk analysis & weather-aware recommendations</p>
             <div className="flex flex-wrap gap-2 mt-3">
-              {['🤖 MobileNetV2 Model', '✅ Leaf Validation', '📊 Quality Check', '🌤️ Weather-Aware', '💊 Smart Recommendations'].map((tag, i) => (
+              {['🤖 EfficientNetV2-B0 Model', '✅ Leaf Validation', '📊 Quality Check', '🌤️ Weather-Aware', '💊 Smart Recommendations'].map((tag, i) => (
                 <span key={i} className="px-3 py-1 bg-white bg-opacity-20 rounded-full text-white text-xs border border-white border-opacity-30">
                   {tag}
                 </span>
@@ -190,7 +190,7 @@ export default function DiseaseDetection() {
                 <motion.span className="text-6xl block mb-4"
                   animate={{ y: [-5, 5, -5] }} transition={{ duration: 2, repeat: Infinity }}>🌱</motion.span>
                 <p className="text-gray-500 font-medium">Upload a leaf image to get started</p>
-                <p className="text-gray-400 text-sm mt-2">Our AI will analyze disease, quality, risk level and provide weather-based recommendations</p>
+                <p className="text-gray-400 text-sm mt-2">Our AI will analyze crophealth, quality, risk level and provide weather-based recommendations</p>
               </div>
             )}
 
@@ -201,7 +201,7 @@ export default function DiseaseDetection() {
                   transition={{ duration: 1, repeat: Infinity }}>🔬</motion.span>
                 <p className="text-green-600 font-bold text-lg">AI is analyzing...</p>
                 <div className="space-y-2 mt-4 text-left">
-                  {['Validating leaf image...', 'Checking image quality...', 'Running disease model...', 'Analyzing weather risk...', 'Generating recommendations...'].map((step, i) => (
+                  {['Validating leaf image...', 'Checking image quality...', 'Running health model...', 'Analyzing weather risk...', 'Generating recommendations...'].map((step, i) => (
                     <motion.div key={i}
                       className="flex items-center space-x-2 text-sm text-gray-500"
                       initial={{ opacity: 0, x: -10 }}
@@ -429,8 +429,8 @@ export default function DiseaseDetection() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
             {[
               { icon: '✅', title: 'Leaf Validation', desc: 'AI first validates that uploaded image is actually a plant/crop leaf', color: 'border-green-100 bg-green-50' },
-              { icon: '📊', title: 'Quality Check', desc: 'Checks blur score and brightness before running disease detection', color: 'border-blue-100 bg-blue-50' },
-              { icon: '🌤️', title: 'Weather-Aware', desc: 'Combines disease detection with real-time weather for smarter recommendations', color: 'border-yellow-100 bg-yellow-50' },
+              { icon: '📊', title: 'Quality Check', desc: 'Checks blur score and brightness before running crop health analysis', color: 'border-blue-100 bg-blue-50' },
+              { icon: '🌤️', title: 'Weather-Aware', desc: 'Combines crop health analysis with real-time weather for smarter recommendations', color: 'border-yellow-100 bg-yellow-50' },
             ].map((card, i) => (
               <motion.div key={i}
                 className={`border ${card.color} rounded-xl p-4 flex items-start space-x-3`}

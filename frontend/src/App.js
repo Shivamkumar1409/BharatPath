@@ -2,7 +2,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import HomePage from './pages/HomePage';
 import Dashboard from './pages/Dashboard';
-import DiseaseDetection from './pages/DiseaseDetection';
+import CropHealth from './pages/CropHealth';
 import MandiOptimizer from './pages/MandiOptimizer';
 import ProfitTracker from './pages/ProfitTracker';
 import Schemes from './pages/Schemes';
@@ -24,7 +24,7 @@ function App() {
         <Routes>
           {/* Public route — shows HomePage if not logged in, Dashboard if logged in */}
           <Route path="/" element={user ? <Dashboard /> : <HomePage />} />
-          <Route path="/disease" element={<DiseaseDetection />} />
+          <Route path="/crop-health" element={<CropHealth />} />
           <Route path="/mandi" element={<MandiOptimizer />} />
           <Route path="/mandi-map" element={<MandiMap />} />
           <Route path="/weather" element={<Weather />} />
