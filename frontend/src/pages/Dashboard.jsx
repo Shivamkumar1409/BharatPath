@@ -98,8 +98,7 @@ const quickLinks = [
 
 const stats = [
   { label: 'Net Profit', value: 45200, prefix: '₹', icon: '💰', color: 'from-green-400 to-green-600', textColor: 'text-green-600' },
-  { label: 'Crops Tracked', value: 12, icon: '🌿', color: 'from-blue-400 to-blue-600', textColor: 'text-blue-600' },
-  { label: 'Crops Analysed', value: 3, icon: '🌿', color: 'from-green-400 to-green-600', textColor: 'text-green-600' },
+  { label: 'Crops Analysed', value: 38, icon: '🌿', color: 'from-green-400 to-green-600', textColor: 'text-green-600' },
   { label: 'Schemes Available', value: 8, icon: '🏛️', color: 'from-purple-400 to-purple-600', textColor: 'text-purple-600' },
 ];
 
