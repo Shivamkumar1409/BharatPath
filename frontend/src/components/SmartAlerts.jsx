@@ -1,14 +1,18 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 
+// 💡 FIXED: Added dynamic base URL for Vercel vs Localhost compatibility
+const BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
+
 const SmartAlerts = () => {
 
     const [alerts, setAlerts] = useState([]);
 
     useEffect(() => {
 
+        // 💡 FIXED: Replaced hardcoded localhost URL with dynamic BASE_URL
         axios
-            .get("http://127.0.0.1:8000/smart-alerts/Delhi")
+            .get(`${BASE_URL}/smart-alerts/Delhi`)
             .then((response) => {
 
                 setAlerts(response.data.alerts);

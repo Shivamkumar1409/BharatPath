@@ -2,6 +2,9 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 
+// 💡 FIXED: Added dynamic base URL for Vercel vs Localhost
+const BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
+
 const CITIES = [
   'Delhi', 'Mumbai', 'Lucknow', 'Patna', 'Jaipur',
   'Bhopal', 'Hyderabad', 'Chennai', 'Kolkata', 'Pune',
@@ -81,9 +84,10 @@ export default function Weather() {
   const fetchWeather = async (selectedCity) => {
     setLoading(true); setError(null);
     try {
+      // 💡 FIXED: Using BASE_URL instead of hardcoded localhost
       const [w, f] = await Promise.all([
-        axios.get(`http://localhost:8000/weather/current?city=${selectedCity}`),
-        axios.get(`http://localhost:8000/weather/forecast?city=${selectedCity}`)
+        axios.get(`${BASE_URL}/weather/current?city=${selectedCity}`),
+        axios.get(`${BASE_URL}/weather/forecast?city=${selectedCity}`)
       ]);
       w.data.error ? setError(w.data.error) : setWeather(w.data);
       if (!f.data.error) setForecast(f.data);
