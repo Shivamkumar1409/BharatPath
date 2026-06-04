@@ -111,7 +111,7 @@ export default function Navbar() {
 
               }}
 
-              className="bg-white text-black px-3 py-2 rounded-lg font-semibold outline-none shadow-md"
+              className="bg-green-600 text-white px-3 py-2 rounded-lg font-semibold outline-none shadow-md"
             >
 
               <option value="">🌐 Language</option>
