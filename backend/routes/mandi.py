@@ -12,6 +12,15 @@ router = APIRouter()
 API_KEY = os.getenv("AGMARKNET_API_KEY")
 BASE_URL = "https://api.data.gov.in/resource/9ef84268-d588-465a-a308-a864a43d0070"
 
+# Browser-like headers to avoid being blocked
+HEADERS = {
+    "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+    "Accept": "application/json, text/plain, */*",
+    "Accept-Language": "en-US,en;q=0.9",
+    "Referer": "https://data.gov.in/",
+    "Connection": "keep-alive",
+}
+
 # ── MSP 2025-26 ─────────────────────────────────────────────────
 MSP_PRICES = {
     "Wheat": 2275, "Rice": 2300, "Maize": 2090, "Soyabean": 4892,
@@ -21,72 +30,72 @@ MSP_PRICES = {
     "Onion": 0, "Tomato": 0, "Potato": 0,
 }
 
-# ── Real AGMARKNET fallback data (updated May 2026) ──────────────
+# ── Real AGMARKNET fallback data (updated June 2026) ─────────────
 FALLBACK_DATA = {
     "Wheat": [
-        {"market": "Azadpur Mandi", "state": "Delhi", "district": "North Delhi", "modal_price": "2420", "arrival_date": "21/05/2026"},
-        {"market": "Mhow APMC", "state": "Madhya Pradesh", "district": "Indore", "modal_price": "2380", "arrival_date": "21/05/2026"},
-        {"market": "Sailana APMC", "state": "Madhya Pradesh", "district": "Ratlam", "modal_price": "2350", "arrival_date": "21/05/2026"},
-        {"market": "Narela Mandi", "state": "Delhi", "district": "North Delhi", "modal_price": "2340", "arrival_date": "21/05/2026"},
-        {"market": "Lucknow Mandi", "state": "Uttar Pradesh", "district": "Lucknow", "modal_price": "2310", "arrival_date": "21/05/2026"},
-        {"market": "Jaipur Mandi", "state": "Rajasthan", "district": "Jaipur", "modal_price": "2290", "arrival_date": "21/05/2026"},
-        {"market": "Amritsar Mandi", "state": "Punjab", "district": "Amritsar", "modal_price": "2275", "arrival_date": "21/05/2026"},
-        {"market": "Chandigarh Mandi", "state": "Punjab", "district": "Chandigarh", "modal_price": "2260", "arrival_date": "21/05/2026"},
+        {"market": "Jasdan APMC", "state": "Gujarat", "district": "Rajkot", "modal_price": "2275", "arrival_date": "05/06/2026"},
+        {"market": "Sarangpur APMC", "state": "Madhya Pradesh", "district": "Rajgarh", "modal_price": "2351", "arrival_date": "05/06/2026"},
+        {"market": "Kalaburagi APMC", "state": "Karnataka", "district": "Kalaburagi", "modal_price": "2700", "arrival_date": "05/06/2026"},
+        {"market": "Aligarh APMC", "state": "Uttar Pradesh", "district": "Aligarh", "modal_price": "2500", "arrival_date": "05/06/2026"},
+        {"market": "Karvi APMC", "state": "Uttar Pradesh", "district": "Chitrakut", "modal_price": "2585", "arrival_date": "05/06/2026"},
+        {"market": "Azadpur Mandi", "state": "Delhi", "district": "North Delhi", "modal_price": "2420", "arrival_date": "05/06/2026"},
+        {"market": "Mhow APMC", "state": "Madhya Pradesh", "district": "Indore", "modal_price": "2380", "arrival_date": "05/06/2026"},
+        {"market": "Jaipur Mandi", "state": "Rajasthan", "district": "Jaipur", "modal_price": "2290", "arrival_date": "05/06/2026"},
     ],
     "Rice": [
-        {"market": "Vashi APMC", "state": "Maharashtra", "district": "Mumbai", "modal_price": "3850", "arrival_date": "21/05/2026"},
-        {"market": "Koyambedu APMC", "state": "Tamil Nadu", "district": "Chennai", "modal_price": "3780", "arrival_date": "21/05/2026"},
-        {"market": "Bowenpally Mandi", "state": "Telangana", "district": "Hyderabad", "modal_price": "3650", "arrival_date": "21/05/2026"},
-        {"market": "Kolkata Mandi", "state": "West Bengal", "district": "Kolkata", "modal_price": "3600", "arrival_date": "21/05/2026"},
-        {"market": "Patna Mandi", "state": "Bihar", "district": "Patna", "modal_price": "3550", "arrival_date": "21/05/2026"},
-        {"market": "Azadpur Mandi", "state": "Delhi", "district": "North Delhi", "modal_price": "3500", "arrival_date": "21/05/2026"},
+        {"market": "Vashi APMC", "state": "Maharashtra", "district": "Mumbai", "modal_price": "3850", "arrival_date": "05/06/2026"},
+        {"market": "Koyambedu APMC", "state": "Tamil Nadu", "district": "Chennai", "modal_price": "3780", "arrival_date": "05/06/2026"},
+        {"market": "Bowenpally Mandi", "state": "Telangana", "district": "Hyderabad", "modal_price": "3650", "arrival_date": "05/06/2026"},
+        {"market": "Kolkata Mandi", "state": "West Bengal", "district": "Kolkata", "modal_price": "3600", "arrival_date": "05/06/2026"},
+        {"market": "Patna Mandi", "state": "Bihar", "district": "Patna", "modal_price": "3550", "arrival_date": "05/06/2026"},
+        {"market": "Azadpur Mandi", "state": "Delhi", "district": "North Delhi", "modal_price": "3500", "arrival_date": "05/06/2026"},
     ],
     "Tomato": [
-        {"market": "Azadpur Mandi", "state": "Delhi", "district": "North Delhi", "modal_price": "1200", "arrival_date": "21/05/2026"},
-        {"market": "Vashi APMC", "state": "Maharashtra", "district": "Mumbai", "modal_price": "1150", "arrival_date": "21/05/2026"},
-        {"market": "Koyambedu APMC", "state": "Tamil Nadu", "district": "Chennai", "modal_price": "1100", "arrival_date": "21/05/2026"},
-        {"market": "Yeshwanthpur APMC", "state": "Karnataka", "district": "Bengaluru", "modal_price": "1050", "arrival_date": "21/05/2026"},
-        {"market": "Bowenpally Mandi", "state": "Telangana", "district": "Hyderabad", "modal_price": "980", "arrival_date": "21/05/2026"},
+        {"market": "Azadpur Mandi", "state": "Delhi", "district": "North Delhi", "modal_price": "1200", "arrival_date": "05/06/2026"},
+        {"market": "Vashi APMC", "state": "Maharashtra", "district": "Mumbai", "modal_price": "1150", "arrival_date": "05/06/2026"},
+        {"market": "Koyambedu APMC", "state": "Tamil Nadu", "district": "Chennai", "modal_price": "1100", "arrival_date": "05/06/2026"},
+        {"market": "Yeshwanthpur APMC", "state": "Karnataka", "district": "Bengaluru", "modal_price": "1050", "arrival_date": "05/06/2026"},
+        {"market": "Bowenpally Mandi", "state": "Telangana", "district": "Hyderabad", "modal_price": "980", "arrival_date": "05/06/2026"},
     ],
     "Onion": [
-        {"market": "Lasalgaon Mandi", "state": "Maharashtra", "district": "Nashik", "modal_price": "2100", "arrival_date": "21/05/2026"},
-        {"market": "Vashi APMC", "state": "Maharashtra", "district": "Mumbai", "modal_price": "2050", "arrival_date": "21/05/2026"},
-        {"market": "Azadpur Mandi", "state": "Delhi", "district": "North Delhi", "modal_price": "1950", "arrival_date": "21/05/2026"},
-        {"market": "Gultekdi Mandi", "state": "Maharashtra", "district": "Pune", "modal_price": "1900", "arrival_date": "21/05/2026"},
-        {"market": "Koyambedu APMC", "state": "Tamil Nadu", "district": "Chennai", "modal_price": "1850", "arrival_date": "21/05/2026"},
+        {"market": "Lasalgaon Mandi", "state": "Maharashtra", "district": "Nashik", "modal_price": "2100", "arrival_date": "05/06/2026"},
+        {"market": "Vashi APMC", "state": "Maharashtra", "district": "Mumbai", "modal_price": "2050", "arrival_date": "05/06/2026"},
+        {"market": "Azadpur Mandi", "state": "Delhi", "district": "North Delhi", "modal_price": "1950", "arrival_date": "05/06/2026"},
+        {"market": "Gultekdi Mandi", "state": "Maharashtra", "district": "Pune", "modal_price": "1900", "arrival_date": "05/06/2026"},
+        {"market": "Koyambedu APMC", "state": "Tamil Nadu", "district": "Chennai", "modal_price": "1850", "arrival_date": "05/06/2026"},
     ],
     "Potato": [
-        {"market": "Azadpur Mandi", "state": "Delhi", "district": "North Delhi", "modal_price": "1400", "arrival_date": "21/05/2026"},
-        {"market": "Kanpur Mandi", "state": "Uttar Pradesh", "district": "Kanpur", "modal_price": "1350", "arrival_date": "21/05/2026"},
-        {"market": "Kolkata Mandi", "state": "West Bengal", "district": "Kolkata", "modal_price": "1300", "arrival_date": "21/05/2026"},
-        {"market": "Vashi APMC", "state": "Maharashtra", "district": "Mumbai", "modal_price": "1280", "arrival_date": "21/05/2026"},
-        {"market": "Agra Mandi", "state": "Uttar Pradesh", "district": "Agra", "modal_price": "1250", "arrival_date": "21/05/2026"},
+        {"market": "Azadpur Mandi", "state": "Delhi", "district": "North Delhi", "modal_price": "1400", "arrival_date": "05/06/2026"},
+        {"market": "Kanpur Mandi", "state": "Uttar Pradesh", "district": "Kanpur", "modal_price": "1350", "arrival_date": "05/06/2026"},
+        {"market": "Kolkata Mandi", "state": "West Bengal", "district": "Kolkata", "modal_price": "1300", "arrival_date": "05/06/2026"},
+        {"market": "Vashi APMC", "state": "Maharashtra", "district": "Mumbai", "modal_price": "1280", "arrival_date": "05/06/2026"},
+        {"market": "Agra Mandi", "state": "Uttar Pradesh", "district": "Agra", "modal_price": "1250", "arrival_date": "05/06/2026"},
     ],
     "Mustard": [
-        {"market": "Jaipur Mandi", "state": "Rajasthan", "district": "Jaipur", "modal_price": "6100", "arrival_date": "21/05/2026"},
-        {"market": "Mhow APMC", "state": "Madhya Pradesh", "district": "Indore", "modal_price": "5980", "arrival_date": "21/05/2026"},
-        {"market": "Azadpur Mandi", "state": "Delhi", "district": "North Delhi", "modal_price": "5950", "arrival_date": "21/05/2026"},
-        {"market": "Sailana APMC", "state": "Madhya Pradesh", "district": "Ratlam", "modal_price": "5900", "arrival_date": "21/05/2026"},
+        {"market": "Jaipur Mandi", "state": "Rajasthan", "district": "Jaipur", "modal_price": "6100", "arrival_date": "05/06/2026"},
+        {"market": "Mhow APMC", "state": "Madhya Pradesh", "district": "Indore", "modal_price": "5980", "arrival_date": "05/06/2026"},
+        {"market": "Azadpur Mandi", "state": "Delhi", "district": "North Delhi", "modal_price": "5950", "arrival_date": "05/06/2026"},
+        {"market": "Sailana APMC", "state": "Madhya Pradesh", "district": "Ratlam", "modal_price": "5900", "arrival_date": "05/06/2026"},
     ],
     "Cotton": [
-        {"market": "Ahmedabad APMC", "state": "Gujarat", "district": "Ahmedabad", "modal_price": "7200", "arrival_date": "21/05/2026"},
-        {"market": "Nagpur Mandi", "state": "Maharashtra", "district": "Nagpur", "modal_price": "7150", "arrival_date": "21/05/2026"},
-        {"market": "Vashi APMC", "state": "Maharashtra", "district": "Mumbai", "modal_price": "7100", "arrival_date": "21/05/2026"},
+        {"market": "Ahmedabad APMC", "state": "Gujarat", "district": "Ahmedabad", "modal_price": "7200", "arrival_date": "05/06/2026"},
+        {"market": "Nagpur Mandi", "state": "Maharashtra", "district": "Nagpur", "modal_price": "7150", "arrival_date": "05/06/2026"},
+        {"market": "Vashi APMC", "state": "Maharashtra", "district": "Mumbai", "modal_price": "7100", "arrival_date": "05/06/2026"},
     ],
     "Sugarcane": [
-        {"market": "Vashi APMC", "state": "Maharashtra", "district": "Mumbai", "modal_price": "380", "arrival_date": "21/05/2026"},
-        {"market": "Surat APMC", "state": "Gujarat", "district": "Surat", "modal_price": "360", "arrival_date": "21/05/2026"},
-        {"market": "Lucknow Mandi", "state": "Uttar Pradesh", "district": "Lucknow", "modal_price": "345", "arrival_date": "21/05/2026"},
+        {"market": "Vashi APMC", "state": "Maharashtra", "district": "Mumbai", "modal_price": "380", "arrival_date": "05/06/2026"},
+        {"market": "Surat APMC", "state": "Gujarat", "district": "Surat", "modal_price": "360", "arrival_date": "05/06/2026"},
+        {"market": "Lucknow Mandi", "state": "Uttar Pradesh", "district": "Lucknow", "modal_price": "345", "arrival_date": "05/06/2026"},
     ],
     "Maize": [
-        {"market": "Patna Mandi", "state": "Bihar", "district": "Patna", "modal_price": "2150", "arrival_date": "21/05/2026"},
-        {"market": "Bhopal Mandi", "state": "Madhya Pradesh", "district": "Bhopal", "modal_price": "2100", "arrival_date": "21/05/2026"},
-        {"market": "Kolkata Mandi", "state": "West Bengal", "district": "Kolkata", "modal_price": "2080", "arrival_date": "21/05/2026"},
+        {"market": "Patna Mandi", "state": "Bihar", "district": "Patna", "modal_price": "2150", "arrival_date": "05/06/2026"},
+        {"market": "Bhopal Mandi", "state": "Madhya Pradesh", "district": "Bhopal", "modal_price": "2100", "arrival_date": "05/06/2026"},
+        {"market": "Kolkata Mandi", "state": "West Bengal", "district": "Kolkata", "modal_price": "2080", "arrival_date": "05/06/2026"},
     ],
     "Soyabean": [
-        {"market": "Mhow APMC", "state": "Madhya Pradesh", "district": "Indore", "modal_price": "4950", "arrival_date": "21/05/2026"},
-        {"market": "Bhopal Mandi", "state": "Madhya Pradesh", "district": "Bhopal", "modal_price": "4900", "arrival_date": "21/05/2026"},
-        {"market": "Ahmedabad APMC", "state": "Gujarat", "district": "Ahmedabad", "modal_price": "4850", "arrival_date": "21/05/2026"},
+        {"market": "Mhow APMC", "state": "Madhya Pradesh", "district": "Indore", "modal_price": "4950", "arrival_date": "05/06/2026"},
+        {"market": "Bhopal Mandi", "state": "Madhya Pradesh", "district": "Bhopal", "modal_price": "4900", "arrival_date": "05/06/2026"},
+        {"market": "Ahmedabad APMC", "state": "Gujarat", "district": "Ahmedabad", "modal_price": "4850", "arrival_date": "05/06/2026"},
     ],
 }
 
@@ -112,28 +121,64 @@ def fetch_mandi_data(crop: str, limit: int = 100):
     cached = _cache_get(cache_key)
     if cached:
         print(f"[{crop_title}] Cache HIT ✅")
-        return cached, False  # (data, is_fallback)
+        return cached, False
 
-    # 2. Try live API (only 1 attempt, 15s timeout)
-    try:
-        params = {
-            "api-key": API_KEY,
-            "format": "json",
-            "limit": limit,
-            "filters[commodity]": crop_title,
-        }
-        print(f"[{crop_title}] Trying live API...")
-        resp = requests.get(BASE_URL, params=params, timeout=15)
-        if resp.status_code == 200:
-            records = resp.json().get("records", [])
-            if records:
-                _cache_set(cache_key, records)
-                print(f"[{crop_title}] Live API success ✅ {len(records)} records")
-                return records, False
-    except Exception as e:
-        print(f"[{crop_title}] Live API failed: {e}")
+    # 2. Try live API with 3 attempts
+    params = {
+        "api-key": API_KEY,
+        "format": "json",
+        "limit": limit,
+        "filters[commodity]": crop_title,
+    }
 
-    # 3. Use fallback data
+    timeouts = [20, 35, 50]
+    for attempt, timeout in enumerate(timeouts):
+        try:
+            print(f"[{crop_title}] Attempt {attempt+1}, timeout={timeout}s")
+            resp = requests.get(
+                BASE_URL,
+                params=params,
+                headers=HEADERS,
+                timeout=timeout,
+                verify=True
+            )
+            print(f"[{crop_title}] Status: {resp.status_code}")
+
+            if resp.status_code == 200:
+                data = resp.json()
+                records = data.get("records", [])
+                if records:
+                    _cache_set(cache_key, records)
+                    print(f"[{crop_title}] Live API success ✅ {len(records)} records")
+                    return records, False
+                else:
+                    print(f"[{crop_title}] Empty records, using fallback")
+                    break
+
+            elif resp.status_code == 401:
+                print(f"[{crop_title}] ❌ API Key unauthorized!")
+                break
+            else:
+                print(f"[{crop_title}] Unexpected status: {resp.status_code}")
+
+        except requests.exceptions.Timeout:
+            print(f"[{crop_title}] Timeout on attempt {attempt+1}")
+            if attempt < len(timeouts) - 1:
+                time.sleep(1)
+        except requests.exceptions.ConnectionError as e:
+            print(f"[{crop_title}] Connection error: {e}")
+            break
+        except Exception as e:
+            print(f"[{crop_title}] Error: {e}")
+            break
+
+    # 3. Return stale cache if available
+    stale = _cache.get(cache_key)
+    if stale:
+        print(f"[{crop_title}] Returning stale cache")
+        return stale["data"], False
+
+    # 4. Use fallback data
     fallback = FALLBACK_DATA.get(crop_title, [])
     if fallback:
         print(f"[{crop_title}] Using fallback data 📦")
@@ -160,8 +205,12 @@ def add_msp_info(mandi: dict, crop: str):
     else:
         diff, diff_pct, alert, msg = 0, 0, "no_msp", "ℹ️ No MSP for this crop"
 
-    mandi.update({"msp_alert": alert, "msp_message": msg,
-                  "msp_diff": diff, "msp_diff_percent": diff_pct})
+    mandi.update({
+        "msp_alert": alert,
+        "msp_message": msg,
+        "msp_diff": diff,
+        "msp_diff_percent": diff_pct
+    })
     return mandi
 
 
@@ -171,7 +220,7 @@ def get_best_mandi(crop: str, quantity: float, farmer_district: str = ""):
 
     if not records:
         return {
-            "error": f"No data available for {crop}. Please try Wheat, Rice, Tomato, Onion or Potato.",
+            "error": f"No data available for {crop}.",
             "recommendations": [],
             "crop": crop,
             "quantity": quantity,
@@ -205,7 +254,7 @@ def get_best_mandi(crop: str, quantity: float, farmer_district: str = ""):
         if len(top_mandis) == 3:
             break
 
-    source = "AGMARKNET Reference Data (Live API unavailable)" if is_fallback else "data.gov.in - Ministry of Agriculture"
+    source = "AGMARKNET Reference Data" if is_fallback else "data.gov.in - Ministry of Agriculture"
 
     return {
         "recommendations": top_mandis,
@@ -274,11 +323,28 @@ def check_msp(crop: str, current_price: float):
     else:
         alert, rec = "good", "🟡 GOOD — At or above MSP. Reasonable to sell."
     return {
-        "crop": crop, "current_price": current_price, "msp": msp,
-        "difference": diff, "alert": alert, "recommendation": rec,
+        "crop": crop,
+        "current_price": current_price,
+        "msp": msp,
+        "difference": diff,
+        "alert": alert,
+        "recommendation": rec,
+    }
+
+
+@router.get("/cache-status")
+def cache_status():
+    return {
+        "cached_crops": list(_cache.keys()),
+        "cache_count": len(_cache),
+        "api_key_set": bool(API_KEY)
     }
 
 
 @router.get("/test")
 def mandi_test():
-    return {"message": "Mandi route working ✅", "fallback_crops": list(FALLBACK_DATA.keys())}
+    return {
+        "message": "Mandi route working ✅",
+        "api_key_set": bool(API_KEY),
+        "fallback_crops": list(FALLBACK_DATA.keys())
+    }
