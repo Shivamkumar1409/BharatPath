@@ -12,7 +12,7 @@ const features = [
 ];
 
 const stats = [
-  { value: '3,000+', label: 'Mandis Covered', icon: '🏪' },
+  { value: '20+', label: 'Mandis Covered', icon: '🏪' },
   { value: '38', label: 'Crop Health Conditions Analysed', icon: '🌿' },
   { value: '8+', label: 'Govt Schemes Listed', icon: '🏛️' },
   { value: '700+', label: 'Indian Cities Weather', icon: '🌤️' },
