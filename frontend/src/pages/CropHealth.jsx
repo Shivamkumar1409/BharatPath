@@ -280,16 +280,6 @@ export default function CropHealth() {
                         <p className={`text-xl font-black ${colors.text}`}>{result.confidence_percent}%</p>
                         <p className="text-gray-400 text-xs">{result.confidence_level}</p>
                       </div>
-                      <div className="bg-white rounded-xl p-3 text-center border border-gray-100">
-                        <p className="text-gray-400 text-xs mb-1">Blur Score</p>
-                        <p className="text-xl font-black text-blue-600">{result.image_quality?.blur_score}</p>
-                        <p className="text-gray-400 text-xs">Image Quality</p>
-                      </div>
-                      <div className="bg-white rounded-xl p-3 text-center border border-gray-100">
-                        <p className="text-gray-400 text-xs mb-1">Brightness</p>
-                        <p className="text-xl font-black text-purple-600">{result.image_quality?.brightness}</p>
-                        <p className="text-gray-400 text-xs">Light Level</p>
-                      </div>
                     </div>
 
                     {result.confidence_message && (
